@@ -1,0 +1,542 @@
+# IMPLEMENTATION.md
+
+# Prototype Implementation Plan
+
+Implement in vertical slices.
+
+When instructed to **do the next thing**, complete the first unchecked slice whose prerequisites are satisfied.
+
+Do not implement later slices early merely because they appear straightforward.
+
+---
+
+# Slice 1 — Bootstrap the Application
+
+Goal:
+
+A clean Next.js application starts successfully and clearly identifies itself as the Video Editor Client Portal prototype.
+
+* [x] Create or configure Next.js with TypeScript.
+* [x] Add basic application shell.
+* [x] Add simple navigation.
+* [x] Add prototype warning/banner in development:
+
+  * `Prototype — authentication and production security are not implemented.`
+* [x] Create `.env.example`.
+* [x] Add environment-variable validation.
+* [x] Add basic README startup instructions.
+* [x] Verify lint.
+* [x] Verify production build.
+
+Expected output:
+
+```text
+/
+```
+
+renders the prototype.
+
+---
+
+# Slice 2 — Stub Customer Identity
+
+Goal:
+
+Allow development without real authentication.
+
+* [ ] Create a stub Demo Customer.
+* [ ] Create `getCurrentUser()` or equivalent abstraction.
+* [ ] Current user includes:
+
+  * id
+  * customer id
+  * name
+  * email
+  * role
+* [ ] Display current customer in portal.
+* [ ] Add logout only if needed for the stub experience.
+* [ ] Do not implement real authentication.
+* [ ] Verify build.
+
+Expected result:
+
+```text
+Logged in as:
+Demo Client
+client@example.com
+```
+
+---
+
+# Slice 3 — Airtable Connectivity
+
+Goal:
+
+Prove the application can communicate with Airtable server-side.
+
+Required configuration:
+
+```text
+AIRTABLE_TOKEN
+AIRTABLE_BASE_ID
+AIRTABLE_PROJECTS_TABLE
+```
+
+* [ ] Create a server-only Airtable integration module.
+* [ ] Add a simple connectivity operation.
+* [ ] Never send Airtable token to browser.
+* [ ] Provide useful configuration error when credentials are missing.
+* [ ] Add a development-only connectivity check if useful.
+* [ ] Document required Airtable fields.
+* [ ] Verify lint/build.
+
+Expected result:
+
+Application can read/write the configured Airtable base.
+
+Stop if required Airtable configuration does not exist.
+
+---
+
+# Slice 4 — Project List from Airtable
+
+Goal:
+
+Use Airtable as the temporary prototype Project database.
+
+* [ ] Implement Project domain type.
+* [ ] Add `/projects`.
+* [ ] Query Airtable Projects server-side.
+* [ ] Filter/display Demo Customer projects.
+* [ ] Show:
+
+  * title
+  * status
+  * due date
+* [ ] Add empty state.
+* [ ] Add basic error state.
+* [ ] Verify build.
+
+Expected screen:
+
+```text
+Projects
+
+Game 14 Highlights
+Submitted
+Due Aug 25
+
+Podcast Episode 17
+In Production
+Due Aug 27
+```
+
+---
+
+# Slice 5 — Create Project in Airtable
+
+Goal:
+
+A customer creates a Project through the portal.
+
+* [ ] Add `/projects/new`.
+* [ ] Fields:
+
+  * Project Name
+  * Description / Instructions
+  * Due Date optional
+  * Tracking Mode
+* [ ] Tracking options:
+
+  * Project only
+  * Multiple deliverables
+* [ ] Generate Project UUID in application.
+* [ ] Create Airtable Project row.
+* [ ] Store:
+
+  * Project ID
+  * Customer ID
+  * Customer
+  * Project Name
+  * Description
+  * Due Date
+  * Tracking Mode
+  * Portal Status = DRAFT
+  * Created At
+* [ ] Redirect to Project detail page after creation.
+* [ ] Prevent accidental duplicate submission where easy.
+* [ ] Verify build.
+
+Expected result:
+
+Creating a Project in portal immediately creates a corresponding Airtable row.
+
+---
+
+# Slice 6 — Dropbox Connectivity
+
+Goal:
+
+Prove server-side Dropbox API access works with the development account.
+
+Required configuration:
+
+```text
+DROPBOX_ACCESS_TOKEN
+```
+
+* [ ] Install/use appropriate Dropbox SDK or API client.
+* [ ] Create server-only Dropbox integration module.
+* [ ] Never expose Dropbox access token to browser.
+* [ ] Add simple account/connectivity check.
+* [ ] Handle missing token cleanly.
+* [ ] Verify build.
+
+Expected result:
+
+Application can call Dropbox using the developer's account.
+
+Do not upload a large file.
+
+---
+
+# Slice 7 — Provision Project Dropbox Folders
+
+Goal:
+
+Creating a Project provisions its Dropbox workspace.
+
+Desired structure:
+
+```text
+/Prototype Clients/
+  /{customer-id}/
+    /{project-id}/
+      /01-Source/
+      /02-Review/
+      /03-Final/
+      /99-Internal/
+```
+
+* [ ] Add folder-provisioning function.
+* [ ] Make repeated provisioning reasonably safe.
+* [ ] Provision folders after Project creation.
+* [ ] Store relevant Dropbox path/reference fields in Airtable.
+* [ ] Display Dropbox setup status on Project page.
+* [ ] Provide useful failure error.
+* [ ] Do NOT add background jobs/retry queues.
+* [ ] Verify build.
+
+Expected result:
+
+Creating a Project results in both:
+
+```text
+Airtable row
++
+Dropbox folder hierarchy
+```
+
+---
+
+# Slice 8 — Project Detail Page
+
+Goal:
+
+Give the customer a useful project workspace.
+
+* [ ] Add `/projects/[id]`.
+* [ ] Load Project from Airtable.
+* [ ] Verify it belongs to Demo Customer.
+* [ ] Display:
+
+  * Project title
+  * instructions
+  * due date
+  * status
+  * tracking mode
+  * source-file area
+* [ ] Display Dropbox upload action/status.
+* [ ] Add explicit Submit Project button.
+* [ ] Submit button must NOT yet submit until upload discovery is implemented.
+* [ ] Verify build.
+
+---
+
+# Slice 9 — Prototype Dropbox Upload
+
+Goal:
+
+Prove a small customer file can reach the Project Source area.
+
+Choose the simplest appropriate Dropbox prototype mechanism.
+
+Preferred order:
+
+1. Dropbox File Request if easily supported by the free development account and API flow.
+2. Otherwise a small prototype upload mechanism suitable for test files.
+
+Constraints:
+
+* [ ] Do not proxy or test multi-gigabyte video.
+* [ ] Never expose the developer Dropbox token.
+* [ ] Use only small test files.
+* [ ] Customer can clearly identify the upload destination.
+* [ ] File ends in `01-Source`.
+* [ ] Verify uploaded file exists using Dropbox API.
+* [ ] Verify build.
+
+Expected result:
+
+A test file such as:
+
+```text
+test-video.mp4
+```
+
+exists in the Project Source folder.
+
+---
+
+# Slice 10 — Submit Project
+
+Goal:
+
+Make upload completion an explicit business action.
+
+* [ ] Enable `Submit Project`.
+* [ ] On submit:
+
+  * query Dropbox `01-Source`
+  * require at least one file
+  * collect filenames
+  * update Airtable `Source Files`
+  * update Airtable `Portal Status = SUBMITTED`
+* [ ] Show success message.
+* [ ] Prevent obvious duplicate submission.
+* [ ] Display filenames on Project detail page.
+* [ ] Verify build.
+
+Expected Airtable result:
+
+```text
+Portal Status:
+SUBMITTED
+
+Source Files:
+test-video.mp4
+logo.png
+```
+
+This is the first major prototype checkpoint.
+
+STOP and review the experience after completing this slice before automatically adding substantial scope.
+
+---
+
+# Slice 11 — Editor Status Reflection
+
+Goal:
+
+Prove the editor can operate from Airtable while the customer sees status through the portal.
+
+Use the simplest reliable prototype approach.
+
+Possible implementation:
+
+```text
+Airtable Portal Status
+→ portal reads it on page request/refresh
+```
+
+For the first prototype, do NOT build bidirectional synchronization infrastructure.
+
+* [ ] Allow editor to change approved workflow field in Airtable.
+* [ ] Portal reads updated status.
+* [ ] Map internal status to friendly customer label.
+* [ ] Verify:
+
+  * SUBMITTED → Received
+  * IN_PRODUCTION → In production
+  * READY_FOR_REVIEW → Ready for review
+  * CHANGES_REQUESTED → Changes requested
+  * COMPLETED → Complete
+* [ ] Verify build.
+
+Expected proof:
+
+Editor changes Airtable.
+
+Customer refreshes portal.
+
+Customer sees new state.
+
+This satisfies the primary prototype hypothesis.
+
+---
+
+# Prototype Evaluation Gate
+
+Before implementing more features, evaluate:
+
+* [ ] Is project creation understandable?
+* [ ] Does Dropbox provisioning feel useful?
+* [ ] Does the upload workflow feel natural?
+* [ ] Does explicit Submit make sense?
+* [ ] Does the editor like seeing the Project in Airtable?
+* [ ] Is changing status in Airtable convenient?
+* [ ] Is the customer-facing Project page useful?
+* [ ] Are we learning something worth hardening into a real product?
+
+Do not blindly continue adding features if the workflow feels wrong.
+
+---
+
+# Slice 12 — Deliverables
+
+Only implement after the project-level flow works.
+
+Goal:
+
+Support Projects containing many separately tracked outputs.
+
+* [ ] Configure Airtable Deliverables table.
+* [ ] Implement Deliverable domain type.
+* [ ] For MULTI_DELIVERABLE Project, allow Deliverables.
+* [ ] Fields:
+
+  * Deliverable ID
+  * Project
+  * Title
+  * Status
+  * Sort Order
+* [ ] Show Deliverables on Project page.
+* [ ] Do not create Deliverables for PROJECT mode.
+* [ ] Calculate:
+
+  * complete count
+  * total count
+* [ ] Verify build.
+
+---
+
+# Slice 13 — Optional Customer Progress
+
+Goal:
+
+Test whether aggregate progress is useful.
+
+* [ ] Add `show_progress_to_customer` prototype setting.
+* [ ] When false, hide counts.
+* [ ] When true and MULTI_DELIVERABLE:
+
+  * display `X of Y deliverables complete`
+* [ ] Optional visual percentage may accompany the count.
+* [ ] Do not show numeric progress for PROJECT mode.
+* [ ] Do not implement weighted progress.
+* [ ] Verify build.
+
+---
+
+# Slice 14 — Prototype Review
+
+Goal:
+
+Prove completed work can move back toward the customer.
+
+* [ ] Editor places small test output in `02-Review`.
+* [ ] Add editor workflow action/status `READY_FOR_REVIEW`.
+* [ ] When portal loads a READY_FOR_REVIEW Project:
+
+  * query Review folder
+  * list relevant review file(s)
+* [ ] Show review file to Demo Customer.
+* [ ] Notification may initially be simulated.
+* [ ] Do not build complete ReviewRound persistence.
+* [ ] Verify build.
+
+Expected result:
+
+```text
+Your edit is ready for review.
+
+review-test.mp4
+[View / Download]
+```
+
+---
+
+# Slice 15 — Request Changes
+
+Goal:
+
+Prove feedback can flow from customer back to editor.
+
+* [ ] Add `Request Changes`.
+* [ ] Accept plain-text feedback.
+* [ ] Update Airtable:
+
+  * Portal Status = CHANGES_REQUESTED
+  * Latest Feedback
+* [ ] Display submitted feedback to customer.
+* [ ] Editor can see it in Airtable.
+* [ ] Verify build.
+
+Do not create frame-accurate commenting.
+
+---
+
+# Slice 16 — Complete Prototype Loop
+
+Goal:
+
+Demonstrate the entire conceptual loop.
+
+* [ ] Editor places test final file in `03-Final`.
+* [ ] Editor marks Project COMPLETE.
+* [ ] Portal lists final file.
+* [ ] Customer can access/download it.
+* [ ] Verify all core prototype flows manually.
+* [ ] Record known production gaps in README/docs.
+* [ ] Verify lint.
+* [ ] Verify production build.
+
+Expected demonstration:
+
+```text
+Create
+→ Upload
+→ Submit
+→ Work
+→ Review
+→ Changes
+→ Complete
+```
+
+---
+
+# Explicitly Deferred to Production MVP
+
+Do not add these during prototype implementation unless the user explicitly changes scope:
+
+* Supabase Auth
+* Supabase canonical database
+* RLS
+* customer memberships
+* real authorization
+* production ReviewRound model
+* ProjectEvents
+* IntegrationTasks
+* retry cron
+* Repair Sync
+* Dropbox continuous webhooks
+* Airtable Automation command system
+* production email
+* security hardening
+* production file-retention policy
+* multiple customer users
+* multiple video editors
+* billing
+* SaaS tenancy
+
+The prototype should remain easy to understand and easy to discard/refactor.
