@@ -185,12 +185,12 @@ Required configuration:
 DROPBOX_ACCESS_TOKEN
 ```
 
-* [ ] Install/use appropriate Dropbox SDK or API client.
-* [ ] Create server-only Dropbox integration module.
-* [ ] Never expose Dropbox access token to browser.
-* [ ] Add simple account/connectivity check.
-* [ ] Handle missing token cleanly.
-* [ ] Verify build.
+* [x] Install/use appropriate Dropbox SDK or API client. (Plain fetch wrapper, consistent with the Airtable module — no extra SDK dependency.)
+* [x] Create server-only Dropbox integration module.
+* [x] Never expose Dropbox access token to browser.
+* [x] Add simple account/connectivity check.
+* [x] Handle missing token cleanly.
+* [x] Verify build.
 
 Expected result:
 

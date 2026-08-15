@@ -70,3 +70,18 @@ With `AIRTABLE_TOKEN`/`AIRTABLE_BASE_ID`/`AIRTABLE_PROJECTS_TABLE` set in
 [http://localhost:3000/dev/airtable](http://localhost:3000/dev/airtable)
 in development to verify connectivity. This route 404s outside
 development.
+
+## Dropbox Setup
+
+Generate an access token for the development Dropbox account (a scoped
+app token, or a short-lived token from the
+[App Console](https://www.dropbox.com/developers/apps) is fine for the
+prototype) and set:
+
+```text
+DROPBOX_ACCESS_TOKEN=<access token>
+```
+
+With it set in `.env.local`, visit
+[http://localhost:3000/dev/dropbox](http://localhost:3000/dev/dropbox) in
+development to verify connectivity. This route 404s outside development.
