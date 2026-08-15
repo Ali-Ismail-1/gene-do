@@ -82,13 +82,13 @@ AIRTABLE_BASE_ID
 AIRTABLE_PROJECTS_TABLE
 ```
 
-* [ ] Create a server-only Airtable integration module.
-* [ ] Add a simple connectivity operation.
-* [ ] Never send Airtable token to browser.
-* [ ] Provide useful configuration error when credentials are missing.
-* [ ] Add a development-only connectivity check if useful.
-* [ ] Document required Airtable fields.
-* [ ] Verify lint/build.
+* [x] Create a server-only Airtable integration module.
+* [x] Add a simple connectivity operation.
+* [x] Never send Airtable token to browser.
+* [x] Provide useful configuration error when credentials are missing.
+* [x] Add a development-only connectivity check if useful.
+* [x] Document required Airtable fields.
+* [x] Verify lint/build.
 
 Expected result:
 

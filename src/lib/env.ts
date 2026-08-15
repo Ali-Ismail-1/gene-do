@@ -1,3 +1,5 @@
+import "server-only";
+
 /**
  * Server-only environment variable access. Never import this from client
  * components — it is not guarded by NEXT_PUBLIC_ and may read secrets.

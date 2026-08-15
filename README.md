@@ -46,3 +46,27 @@ npm run lint    # lint the project
 See [`.env.example`](.env.example) for the full list. Server-side
 integration modules validate required variables at call time and throw a
 clear error if one is missing — no secrets are ever sent to the browser.
+
+## Airtable Setup
+
+Create a base with a **Projects** table (name it to match
+`AIRTABLE_PROJECTS_TABLE`) and a personal access token scoped to that base
+with `data.records:read` and `data.records:write`. Set:
+
+```text
+AIRTABLE_TOKEN=<personal access token>
+AIRTABLE_BASE_ID=<base id, starts with "app">
+AIRTABLE_PROJECTS_TABLE=Projects
+```
+
+The full recommended field list is documented in
+[`docs/PROTOTYPE.md`](docs/PROTOTYPE.md#airtable-prototype-model). At
+minimum the table must exist for the connectivity check to succeed;
+fields are added as later slices need them (Project ID, Customer,
+Project Name, Portal Status, etc.).
+
+With `AIRTABLE_TOKEN`/`AIRTABLE_BASE_ID`/`AIRTABLE_PROJECTS_TABLE` set in
+`.env.local`, visit
+[http://localhost:3000/dev/airtable](http://localhost:3000/dev/airtable)
+in development to verify connectivity. This route 404s outside
+development.
