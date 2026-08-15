@@ -26,9 +26,9 @@ export async function createProjectAction(
 
   const currentUser = getCurrentUser();
 
-  let project;
+  let result;
   try {
-    project = await createProject({
+    result = await createProject({
       customerId: currentUser.customerId,
       customerName: currentUser.name,
       title,
@@ -40,5 +40,8 @@ export async function createProjectAction(
     return { error: (error as Error).message };
   }
 
-  redirect(`/projects/${project.id}`);
+  const query = result.dropboxError
+    ? `?dropboxError=${encodeURIComponent(result.dropboxError)}`
+    : "";
+  redirect(`/projects/${result.project.id}${query}`);
 }

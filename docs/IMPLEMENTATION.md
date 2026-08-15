@@ -218,14 +218,14 @@ Desired structure:
       /99-Internal/
 ```
 
-* [ ] Add folder-provisioning function.
-* [ ] Make repeated provisioning reasonably safe.
-* [ ] Provision folders after Project creation.
-* [ ] Store relevant Dropbox path/reference fields in Airtable.
-* [ ] Display Dropbox setup status on Project page.
-* [ ] Provide useful failure error.
-* [ ] Do NOT add background jobs/retry queues.
-* [ ] Verify build.
+* [x] Add folder-provisioning function.
+* [x] Make repeated provisioning reasonably safe. (Dropbox's "already exists" conflict is treated as success.)
+* [x] Provision folders after Project creation.
+* [x] Store relevant Dropbox path/reference fields in Airtable.
+* [x] Display Dropbox setup status on Project page.
+* [x] Provide useful failure error. (Surfaced via a one-time redirect query param; not persisted — no retry queue.)
+* [x] Do NOT add background jobs/retry queues.
+* [x] Verify build.
 
 Expected result:
 

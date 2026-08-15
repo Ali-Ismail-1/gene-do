@@ -158,6 +158,14 @@ a {
   gap: 1rem;
 }
 
+.dropbox-folder-list {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
 .project-form {
   display: flex;
   flex-direction: column;

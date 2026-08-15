@@ -2,8 +2,10 @@ import "server-only";
 import {
   listProjectRecords,
   createProjectRecord,
+  updateProjectRecord,
   type AirtableRecord,
 } from "./airtable";
+import { provisionProjectFolders } from "./dropbox";
 
 export type TrackingMode = "PROJECT" | "MULTI_DELIVERABLE";
 
@@ -155,7 +157,20 @@ export type NewProjectInput = {
   trackingMode: TrackingMode;
 };
 
-export async function createProject(input: NewProjectInput): Promise<Project> {
+export type CreateProjectResult = {
+  project: Project;
+  dropboxError: string | null;
+};
+
+/**
+ * Creates the Airtable row, then provisions the project's Dropbox folder
+ * structure. A Dropbox failure doesn't roll back the Airtable row — the
+ * project still exists, just without folders yet — but is reported back
+ * so the caller can show it to the customer.
+ */
+export async function createProject(
+  input: NewProjectInput
+): Promise<CreateProjectResult> {
   const fields: Record<string, unknown> = {
     "Project ID": crypto.randomUUID(),
     "Customer ID": input.customerId,
@@ -175,5 +190,21 @@ export async function createProject(input: NewProjectInput): Promise<Project> {
   if (!project) {
     throw new Error("Airtable did not return a valid project record.");
   }
-  return project;
+
+  const provisioned = await provisionProjectFolders(
+    project.customerId,
+    project.id
+  );
+  if (!provisioned.ok) {
+    return { project, dropboxError: provisioned.error };
+  }
+
+  const updatedRecord = await updateProjectRecord(record.id, {
+    "Dropbox Source": provisioned.paths.source,
+    "Dropbox Review": provisioned.paths.review,
+    "Dropbox Final": provisioned.paths.final,
+  });
+  const updatedProject = recordToProject(updatedRecord);
+
+  return { project: updatedProject ?? project, dropboxError: null };
 }

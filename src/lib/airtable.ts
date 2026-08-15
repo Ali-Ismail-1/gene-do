@@ -79,6 +79,31 @@ export async function createProjectRecord(
   return (await response.json()) as AirtableRecord;
 }
 
+/**
+ * Updates a single record (by Airtable's own record id) in the configured
+ * Projects table.
+ */
+export async function updateProjectRecord(
+  recordId: string,
+  fields: Record<string, unknown>
+): Promise<AirtableRecord> {
+  const { projectsTable } = getConfig();
+  const response = await airtableRequest(
+    `/${encodeURIComponent(projectsTable)}/${recordId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ fields, typecast: true }),
+    }
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Airtable request failed (${response.status}): ${body}`);
+  }
+
+  return (await response.json()) as AirtableRecord;
+}
+
 export type AirtableConnectionResult =
   | { ok: true; recordCount: number }
   | { ok: false; error: string };
