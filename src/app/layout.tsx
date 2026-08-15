@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import { getCurrentUser } from "@/lib/current-user";
 
 export const metadata: Metadata = {
   title: "Gene Do — Video Editor Client Portal (Prototype)",
@@ -9,6 +10,8 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  const currentUser = getCurrentUser();
+
   return (
     <html lang="en">
       <body>
@@ -25,6 +28,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <nav className="site-header__nav">
             <Link href="/">Home</Link>
           </nav>
+          <div className="site-header__user">
+            <span className="site-header__user-name">{currentUser.name}</span>
+            <span className="site-header__user-email">
+              {currentUser.email}
+            </span>
+          </div>
         </header>
         <main className="site-main">{children}</main>
         <footer className="site-footer">

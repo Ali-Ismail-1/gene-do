@@ -44,19 +44,19 @@ Goal:
 
 Allow development without real authentication.
 
-* [ ] Create a stub Demo Customer.
-* [ ] Create `getCurrentUser()` or equivalent abstraction.
-* [ ] Current user includes:
+* [x] Create a stub Demo Customer.
+* [x] Create `getCurrentUser()` or equivalent abstraction.
+* [x] Current user includes:
 
   * id
   * customer id
   * name
   * email
   * role
-* [ ] Display current customer in portal.
-* [ ] Add logout only if needed for the stub experience.
-* [ ] Do not implement real authentication.
-* [ ] Verify build.
+* [x] Display current customer in portal.
+* [x] Add logout only if needed for the stub experience. (Not needed — single stub customer, no session to end.)
+* [x] Do not implement real authentication.
+* [x] Verify build.
 
 Expected result:
 
