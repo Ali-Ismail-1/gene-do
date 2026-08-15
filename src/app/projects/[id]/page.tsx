@@ -106,18 +106,21 @@ export default async function ProjectDetailPage({
         <h2>Upload Source Files</h2>
         {dropboxErrorMessage && (
           <p className="error-state">
-            Folder setup failed: {dropboxErrorMessage}
+            We couldn&apos;t finish setting up file storage for this
+            project. Please contact your editor.
           </p>
         )}
         {project.dropboxSourceFolder ? (
           <>
-            <p>Files upload directly into this Dropbox folder:</p>
-            <p className="dropbox-path">{project.dropboxSourceFolder}</p>
+            <p>
+              Add the footage, audio, graphics, and reference files needed
+              for this project.
+            </p>
             <UploadSourceFileForm projectId={project.id} />
           </>
         ) : (
           !dropboxErrorMessage && (
-            <p>Dropbox folders haven&apos;t been set up for this project yet.</p>
+            <p>Upload isn&apos;t available for this project yet.</p>
           )
         )}
       </section>
@@ -127,8 +130,7 @@ export default async function ProjectDetailPage({
           <>
             <SubmitProjectForm projectId={project.id} />
             <p className="project-detail__hint">
-              At least one file must be uploaded to 01-Source before
-              submitting.
+              Upload at least one file above before submitting.
             </p>
           </>
         ) : (
