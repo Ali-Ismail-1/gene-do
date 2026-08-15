@@ -304,18 +304,18 @@ Goal:
 
 Make upload completion an explicit business action.
 
-* [ ] Enable `Submit Project`.
-* [ ] On submit:
+* [x] Enable `Submit Project`.
+* [x] On submit:
 
   * query Dropbox `01-Source`
   * require at least one file
   * collect filenames
   * update Airtable `Source Files`
   * update Airtable `Portal Status = SUBMITTED`
-* [ ] Show success message.
-* [ ] Prevent obvious duplicate submission.
-* [ ] Display filenames on Project detail page.
-* [ ] Verify build.
+* [x] Show success message.
+* [x] Prevent obvious duplicate submission. (Server-side: refuses to resubmit a non-DRAFT project. Client-side: the form disappears once submitted.)
+* [x] Display filenames on Project detail page. (Already live from Dropbox since Slice 9.)
+* [x] Verify build.
 
 Expected Airtable result:
 

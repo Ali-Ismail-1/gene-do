@@ -1,7 +1,7 @@
 "use server";
 
 import { getCurrentUser } from "@/lib/current-user";
-import { getProjectById } from "@/lib/projects";
+import { getProjectById, submitProject } from "@/lib/projects";
 import {
   getProjectFolderPaths,
   listFolderFiles,
@@ -54,4 +54,24 @@ export async function uploadSourceFileAction(
   }
 
   return { error: null, success: `${uploaded.name} uploaded.` };
+}
+
+export type SubmitProjectState = {
+  error: string | null;
+  success: string | null;
+};
+
+export async function submitProjectAction(
+  _prevState: SubmitProjectState,
+  formData: FormData
+): Promise<SubmitProjectState> {
+  const projectId = String(formData.get("projectId") ?? "");
+  const currentUser = getCurrentUser();
+
+  const result = await submitProject(currentUser.customerId, projectId);
+  if (!result.ok) {
+    return { error: result.error, success: null };
+  }
+
+  return { error: null, success: "Project submitted." };
 }

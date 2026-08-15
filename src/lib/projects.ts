@@ -5,7 +5,7 @@ import {
   updateProjectRecord,
   type AirtableRecord,
 } from "./airtable";
-import { provisionProjectFolders } from "./dropbox";
+import { provisionProjectFolders, listFolderFiles } from "./dropbox";
 
 export type TrackingMode = "PROJECT" | "MULTI_DELIVERABLE";
 
@@ -137,20 +137,33 @@ export async function listProjectsForCustomer(
     .filter((project) => project.customerId === customerId);
 }
 
+/**
+ * Finds the raw Airtable record for a project. Exposed alongside
+ * getProjectById because callers that need to write back (e.g. submit)
+ * need Airtable's own record id, not just the domain Project.
+ */
+async function findProjectRecord(
+  customerId: string,
+  projectId: string
+): Promise<AirtableRecord | null> {
+  const records = await listProjectRecords();
+  const record = records.find((candidate) => {
+    const project = recordToProject(candidate);
+    return (
+      project !== null &&
+      project.id === projectId &&
+      project.customerId === customerId
+    );
+  });
+  return record ?? null;
+}
+
 export async function getProjectById(
   customerId: string,
   projectId: string
 ): Promise<Project | null> {
-  const records = await listProjectRecords();
-  const project = records
-    .map(recordToProject)
-    .find(
-      (candidate) =>
-        candidate !== null &&
-        candidate.id === projectId &&
-        candidate.customerId === customerId
-    );
-  return project ?? null;
+  const record = await findProjectRecord(customerId, projectId);
+  return record ? recordToProject(record) : null;
 }
 
 export type NewProjectInput = {
@@ -212,4 +225,71 @@ export async function createProject(
   const updatedProject = recordToProject(updatedRecord);
 
   return { project: updatedProject ?? project, dropboxError: null };
+}
+
+export type SubmitProjectResult =
+  | { ok: true; project: Project }
+  | { ok: false; error: string };
+
+/**
+ * Queries Dropbox 01-Source, requires at least one file, writes the
+ * filenames + SUBMITTED status to Airtable. Refuses to resubmit a
+ * project that isn't still DRAFT, so double-clicking or navigating back
+ * to an already-submitted project can't file a second submission.
+ */
+export async function submitProject(
+  customerId: string,
+  projectId: string
+): Promise<SubmitProjectResult> {
+  const record = await findProjectRecord(customerId, projectId);
+  if (!record) {
+    return { ok: false, error: "Project not found." };
+  }
+
+  const project = recordToProject(record);
+  if (!project) {
+    return { ok: false, error: "Airtable project record is invalid." };
+  }
+
+  if (project.status !== "DRAFT") {
+    return {
+      ok: false,
+      error: `This project has already been submitted (status: ${STATUS_LABELS[project.status]}).`,
+    };
+  }
+
+  if (!project.dropboxSourceFolder) {
+    return {
+      ok: false,
+      error: "Dropbox folders haven't been set up for this project yet.",
+    };
+  }
+
+  const listed = await listFolderFiles(project.dropboxSourceFolder);
+  if (!listed.ok) {
+    return {
+      ok: false,
+      error: `Couldn't check the source folder: ${listed.error}`,
+    };
+  }
+  if (listed.files.length === 0) {
+    return {
+      ok: false,
+      error: "Upload at least one file before submitting.",
+    };
+  }
+
+  const updatedRecord = await updateProjectRecord(record.id, {
+    "Source Files": listed.files.join("\n"),
+    "Portal Status": "SUBMITTED",
+  });
+  const updatedProject = recordToProject(updatedRecord);
+  if (!updatedProject) {
+    return {
+      ok: false,
+      error: "Airtable did not return a valid project record after submitting.",
+    };
+  }
+
+  return { ok: true, project: updatedProject };
 }

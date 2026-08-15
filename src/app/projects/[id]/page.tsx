@@ -8,6 +8,7 @@ import {
 } from "@/lib/projects";
 import { listFolderFiles } from "@/lib/dropbox";
 import { UploadSourceFileForm } from "./UploadSourceFileForm";
+import { SubmitProjectForm } from "./SubmitProjectForm";
 
 function formatDueDate(dueDate: string | null): string {
   if (!dueDate) return "No due date set";
@@ -122,12 +123,19 @@ export default async function ProjectDetailPage({
       </section>
 
       <section>
-        <button type="button" className="button" disabled>
-          Submit Project
-        </button>
-        <p className="project-detail__hint">
-          Submit becomes available once uploaded files can be detected.
-        </p>
+        {project.status === "DRAFT" ? (
+          <>
+            <SubmitProjectForm projectId={project.id} />
+            <p className="project-detail__hint">
+              At least one file must be uploaded to 01-Source before
+              submitting.
+            </p>
+          </>
+        ) : (
+          <p className="project-detail__hint">
+            This project has already been submitted.
+          </p>
+        )}
       </section>
     </div>
   );
