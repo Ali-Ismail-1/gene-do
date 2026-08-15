@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getCurrentUser } from "@/lib/current-user";
 import { listProjectsForCustomer, STATUS_LABELS } from "@/lib/projects";
 
@@ -25,7 +26,10 @@ export default async function ProjectsPage() {
 
   return (
     <div>
-      <h1>Projects</h1>
+      <div className="page-header">
+        <h1>Projects</h1>
+        <Link href="/projects/new">New Project</Link>
+      </div>
 
       {error && (
         <p className="error-state">Couldn&apos;t load projects: {error}</p>
@@ -41,7 +45,12 @@ export default async function ProjectsPage() {
             const dueLabel = formatDueDate(project.dueDate);
             return (
               <li key={project.id} className="project-list__item">
-                <div className="project-list__title">{project.title}</div>
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="project-list__title"
+                >
+                  {project.title}
+                </Link>
                 <div className="project-list__status">
                   {STATUS_LABELS[project.status]}
                 </div>

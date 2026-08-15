@@ -139,20 +139,20 @@ Goal:
 
 A customer creates a Project through the portal.
 
-* [ ] Add `/projects/new`.
-* [ ] Fields:
+* [x] Add `/projects/new`.
+* [x] Fields:
 
   * Project Name
   * Description / Instructions
   * Due Date optional
   * Tracking Mode
-* [ ] Tracking options:
+* [x] Tracking options:
 
   * Project only
   * Multiple deliverables
-* [ ] Generate Project UUID in application.
-* [ ] Create Airtable Project row.
-* [ ] Store:
+* [x] Generate Project UUID in application.
+* [x] Create Airtable Project row.
+* [x] Store:
 
   * Project ID
   * Customer ID
@@ -163,9 +163,9 @@ A customer creates a Project through the portal.
   * Tracking Mode
   * Portal Status = DRAFT
   * Created At
-* [ ] Redirect to Project detail page after creation.
-* [ ] Prevent accidental duplicate submission where easy.
-* [ ] Verify build.
+* [x] Redirect to Project detail page after creation. (Minimal `/projects/[id]` page added as the redirect target; Slice 8 will expand it into the full project workspace.)
+* [x] Prevent accidental duplicate submission where easy. (Submit button disables while the server action is pending.)
+* [x] Verify build.
 
 Expected result:
 

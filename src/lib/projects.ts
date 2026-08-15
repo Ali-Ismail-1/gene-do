@@ -1,5 +1,9 @@
 import "server-only";
-import { listProjectRecords, type AirtableRecord } from "./airtable";
+import {
+  listProjectRecords,
+  createProjectRecord,
+  type AirtableRecord,
+} from "./airtable";
 
 export type TrackingMode = "PROJECT" | "MULTI_DELIVERABLE";
 
@@ -124,4 +128,52 @@ export async function listProjectsForCustomer(
     .map(recordToProject)
     .filter((project): project is Project => project !== null)
     .filter((project) => project.customerId === customerId);
+}
+
+export async function getProjectById(
+  customerId: string,
+  projectId: string
+): Promise<Project | null> {
+  const records = await listProjectRecords();
+  const project = records
+    .map(recordToProject)
+    .find(
+      (candidate) =>
+        candidate !== null &&
+        candidate.id === projectId &&
+        candidate.customerId === customerId
+    );
+  return project ?? null;
+}
+
+export type NewProjectInput = {
+  customerId: string;
+  customerName: string;
+  title: string;
+  description: string;
+  dueDate: string | null;
+  trackingMode: TrackingMode;
+};
+
+export async function createProject(input: NewProjectInput): Promise<Project> {
+  const fields: Record<string, unknown> = {
+    "Project ID": crypto.randomUUID(),
+    "Customer ID": input.customerId,
+    Customer: input.customerName,
+    "Project Name": input.title,
+    Description: input.description,
+    "Tracking Mode": input.trackingMode,
+    "Portal Status": "DRAFT",
+    "Created At": new Date().toISOString(),
+  };
+  if (input.dueDate) {
+    fields["Due Date"] = input.dueDate;
+  }
+
+  const record = await createProjectRecord(fields);
+  const project = recordToProject(record);
+  if (!project) {
+    throw new Error("Airtable did not return a valid project record.");
+  }
+  return project;
 }

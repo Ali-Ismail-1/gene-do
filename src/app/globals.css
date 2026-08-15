@@ -128,7 +128,13 @@ a {
 }
 
 .project-list__title {
+  display: block;
   font-weight: 600;
+  text-decoration: none;
+}
+
+.project-list__title:hover {
+  text-decoration: underline;
 }
 
 .project-list__status {
@@ -143,4 +149,63 @@ a {
 
 .error-state {
   color: #b00020;
+}
+
+.page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+  max-width: 480px;
+}
+
+.project-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.project-form__field input[type="text"],
+.project-form__field input[type="date"],
+.project-form__field textarea {
+  font: inherit;
+  font-weight: 400;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.project-form__radio {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 400;
+  margin-top: 0.4rem;
+}
+
+.project-form button {
+  align-self: flex-start;
+  font: inherit;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--foreground);
+  border-radius: 6px;
+  background: var(--foreground);
+  color: var(--background);
+  cursor: pointer;
+}
+
+.project-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }

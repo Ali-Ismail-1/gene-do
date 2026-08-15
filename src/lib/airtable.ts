@@ -54,6 +54,31 @@ export async function listProjectRecords(): Promise<AirtableRecord[]> {
   return data.records;
 }
 
+/**
+ * Creates a single record in the configured Projects table. `typecast`
+ * lets Airtable coerce plain strings into select options/dates instead of
+ * rejecting them — field *names* still must already exist on the table.
+ */
+export async function createProjectRecord(
+  fields: Record<string, unknown>
+): Promise<AirtableRecord> {
+  const { projectsTable } = getConfig();
+  const response = await airtableRequest(
+    `/${encodeURIComponent(projectsTable)}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ fields, typecast: true }),
+    }
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Airtable request failed (${response.status}): ${body}`);
+  }
+
+  return (await response.json()) as AirtableRecord;
+}
+
 export type AirtableConnectionResult =
   | { ok: true; recordCount: number }
   | { ok: false; error: string };
