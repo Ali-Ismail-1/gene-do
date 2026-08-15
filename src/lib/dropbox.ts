@@ -1,5 +1,6 @@
 import "server-only";
 import { requireEnv } from "./env";
+import { MAX_UPLOAD_BYTES } from "./upload-limits";
 
 const DROPBOX_API_BASE = "https://api.dropboxapi.com/2";
 const DROPBOX_CONTENT_API_BASE = "https://content.dropboxapi.com/2";
@@ -134,8 +135,6 @@ export async function listFolderFiles(
     return { ok: false, error: (error as Error).message };
   }
 }
-
-const MAX_UPLOAD_BYTES = 20 * 1024 * 1024; // prototype: small test files only
 
 export type UploadFileResult =
   | { ok: true; name: string }
