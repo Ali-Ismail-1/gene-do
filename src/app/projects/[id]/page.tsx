@@ -6,6 +6,8 @@ import {
   STATUS_LABELS,
   TRACKING_MODE_LABELS,
 } from "@/lib/projects";
+import { listFolderFiles } from "@/lib/dropbox";
+import { UploadSourceFileForm } from "./UploadSourceFileForm";
 
 function formatDueDate(dueDate: string | null): string {
   if (!dueDate) return "No due date set";
@@ -45,6 +47,10 @@ export default async function ProjectDetailPage({
     ? dropboxError[0]
     : dropboxError;
 
+  const sourceFiles = project.dropboxSourceFolder
+    ? await listFolderFiles(project.dropboxSourceFolder)
+    : null;
+
   return (
     <div className="project-detail">
       <Link href="/projects" className="project-detail__back">
@@ -77,15 +83,22 @@ export default async function ProjectDetailPage({
 
       <section>
         <h2>Source Files</h2>
-        {project.sourceFiles.length > 0 ? (
+        {sourceFiles && !sourceFiles.ok && (
+          <p className="error-state">
+            Couldn&apos;t list source files: {sourceFiles.error}
+          </p>
+        )}
+        {sourceFiles && sourceFiles.ok && sourceFiles.files.length > 0 && (
           <ul>
-            {project.sourceFiles.map((file) => (
+            {sourceFiles.files.map((file) => (
               <li key={file}>{file}</li>
             ))}
           </ul>
-        ) : (
+        )}
+        {sourceFiles && sourceFiles.ok && sourceFiles.files.length === 0 && (
           <p>No files uploaded yet.</p>
         )}
+        {!sourceFiles && <p>No files uploaded yet.</p>}
       </section>
 
       <section>
@@ -97,11 +110,9 @@ export default async function ProjectDetailPage({
         )}
         {project.dropboxSourceFolder ? (
           <>
-            <p>
-              Upload your files to this Dropbox folder. (Direct upload from
-              the portal is coming in a later step.)
-            </p>
+            <p>Files upload directly into this Dropbox folder:</p>
             <p className="dropbox-path">{project.dropboxSourceFolder}</p>
+            <UploadSourceFileForm projectId={project.id} />
           </>
         ) : (
           !dropboxErrorMessage && (

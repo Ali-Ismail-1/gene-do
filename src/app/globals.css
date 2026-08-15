@@ -151,6 +151,20 @@ a {
   color: #b00020;
 }
 
+.success-state {
+  color: #0a7a3d;
+}
+
+.upload-form {
+  margin-top: 0.75rem;
+}
+
+.upload-form__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .page-header {
   display: flex;
   align-items: baseline;

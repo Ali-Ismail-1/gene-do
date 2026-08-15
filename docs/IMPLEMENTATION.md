@@ -278,13 +278,13 @@ Preferred order:
 
 Constraints:
 
-* [ ] Do not proxy or test multi-gigabyte video.
-* [ ] Never expose the developer Dropbox token.
-* [ ] Use only small test files.
-* [ ] Customer can clearly identify the upload destination.
-* [ ] File ends in `01-Source`.
-* [ ] Verify uploaded file exists using Dropbox API.
-* [ ] Verify build.
+* [x] Do not proxy or test multi-gigabyte video. (20 MB cap enforced server-side.)
+* [x] Never expose the developer Dropbox token. (Browser only talks to our server action; the upload is proxied server-side, not a Dropbox File Request.)
+* [x] Use only small test files.
+* [x] Customer can clearly identify the upload destination. (Detail page shows the Dropbox path above the upload control.)
+* [x] File ends in `01-Source`.
+* [x] Verify uploaded file exists using Dropbox API. (list_folder check immediately after upload, using the name Dropbox actually saved it as.)
+* [x] Verify build.
 
 Expected result:
 

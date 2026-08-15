@@ -2,6 +2,7 @@ import "server-only";
 import { requireEnv } from "./env";
 
 const DROPBOX_API_BASE = "https://api.dropboxapi.com/2";
+const DROPBOX_CONTENT_API_BASE = "https://content.dropboxapi.com/2";
 
 function getConfig() {
   return {
@@ -95,6 +96,100 @@ export async function provisionProjectFolders(
   }
 
   return { ok: true, paths };
+}
+
+export type ListFolderFilesResult =
+  | { ok: true; files: string[] }
+  | { ok: false; error: string };
+
+/**
+ * Lists file (not folder) names directly inside a Dropbox folder.
+ * Returns an empty list if the folder doesn't exist yet.
+ */
+export async function listFolderFiles(
+  path: string
+): Promise<ListFolderFilesResult> {
+  try {
+    const response = await dropboxRequest("/files/list_folder", { path });
+
+    if (!response.ok) {
+      const body = await response.text();
+      if (response.status === 409 && body.includes("path/not_found")) {
+        return { ok: true, files: [] };
+      }
+      return {
+        ok: false,
+        error: `Dropbox responded with ${response.status}: ${body}`,
+      };
+    }
+
+    const data = (await response.json()) as {
+      entries: { [".tag"]: string; name: string }[];
+    };
+    const files = data.entries
+      .filter((entry) => entry[".tag"] === "file")
+      .map((entry) => entry.name);
+    return { ok: true, files };
+  } catch (error) {
+    return { ok: false, error: (error as Error).message };
+  }
+}
+
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024; // prototype: small test files only
+
+export type UploadFileResult =
+  | { ok: true; name: string }
+  | { ok: false; error: string };
+
+/**
+ * Uploads a small file to Dropbox at the given path. Auto-renames on a
+ * name collision rather than overwriting. Not for large files — the
+ * prototype only needs to prove small test-file uploads work.
+ */
+export async function uploadFile(
+  path: string,
+  content: ArrayBuffer
+): Promise<UploadFileResult> {
+  if (content.byteLength > MAX_UPLOAD_BYTES) {
+    return {
+      ok: false,
+      error: `File is too large for this prototype (max ${
+        MAX_UPLOAD_BYTES / (1024 * 1024)
+      } MB).`,
+    };
+  }
+
+  try {
+    const { token } = getConfig();
+    const response = await fetch(`${DROPBOX_CONTENT_API_BASE}/files/upload`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/octet-stream",
+        "Dropbox-API-Arg": JSON.stringify({
+          path,
+          mode: "add",
+          autorename: true,
+          mute: true,
+        }),
+      },
+      body: content,
+    });
+
+    if (!response.ok) {
+      const body = await response.text();
+      return {
+        ok: false,
+        error: `Dropbox responded with ${response.status}: ${body}`,
+      };
+    }
+
+    const data = (await response.json()) as { name: string };
+    return { ok: true, name: data.name };
+  } catch (error) {
+    return { ok: false, error: (error as Error).message };
+  }
 }
 
 export type DropboxConnectionResult =
