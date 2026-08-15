@@ -351,17 +351,17 @@ Airtable Portal Status
 
 For the first prototype, do NOT build bidirectional synchronization infrastructure.
 
-* [ ] Allow editor to change approved workflow field in Airtable.
-* [ ] Portal reads updated status.
-* [ ] Map internal status to friendly customer label.
-* [ ] Verify:
+* [x] Allow editor to change approved workflow field in Airtable. (No app change needed — Portal Status is already a plain editable Airtable field.)
+* [x] Portal reads updated status. (Already true structurally since Slice 4 — Airtable fetches are `cache: "no-store"`, so every page request reads live.)
+* [x] Map internal status to friendly customer label.
+* [x] Verify:
 
   * SUBMITTED → Received
   * IN_PRODUCTION → In production
   * READY_FOR_REVIEW → Ready for review
   * CHANGES_REQUESTED → Changes requested
   * COMPLETED → Complete
-* [ ] Verify build.
+* [x] Verify build.
 
 Expected proof:
 

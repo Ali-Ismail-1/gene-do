@@ -28,11 +28,11 @@ const PROJECT_STATUSES: ProjectStatus[] = [
 
 export const STATUS_LABELS: Record<ProjectStatus, string> = {
   DRAFT: "Draft",
-  SUBMITTED: "Submitted",
-  IN_PRODUCTION: "In Production",
-  READY_FOR_REVIEW: "Ready for Review",
-  CHANGES_REQUESTED: "Changes Requested",
-  COMPLETED: "Completed",
+  SUBMITTED: "Received",
+  IN_PRODUCTION: "In production",
+  READY_FOR_REVIEW: "Ready for review",
+  CHANGES_REQUESTED: "Changes requested",
+  COMPLETED: "Complete",
 };
 
 export const TRACKING_MODE_LABELS: Record<TrackingMode, string> = {
