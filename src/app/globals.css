@@ -158,11 +158,47 @@ a {
   gap: 1rem;
 }
 
-.dropbox-folder-list {
+.dropbox-path {
   margin: 0.5rem 0 0;
-  padding-left: 1.2rem;
   color: var(--muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+.project-detail__back {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.project-detail section {
+  margin-top: 2rem;
+}
+
+.project-detail section h2 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.project-detail__meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  margin: 0;
+}
+
+.project-detail__meta dt {
+  color: var(--muted);
+}
+
+.project-detail__meta dd {
+  margin: 0;
+}
+
+.project-detail__hint {
+  margin-top: 0.5rem;
+  color: var(--muted);
   font-size: 0.85rem;
 }
 
@@ -202,7 +238,7 @@ a {
   margin-top: 0.4rem;
 }
 
-.project-form button {
+.button {
   align-self: flex-start;
   font: inherit;
   padding: 0.55rem 1.1rem;
@@ -213,7 +249,7 @@ a {
   cursor: pointer;
 }
 
-.project-form button:disabled {
+.button:disabled {
   opacity: 0.6;
   cursor: default;
 }

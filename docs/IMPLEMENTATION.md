@@ -245,10 +245,10 @@ Goal:
 
 Give the customer a useful project workspace.
 
-* [ ] Add `/projects/[id]`.
-* [ ] Load Project from Airtable.
-* [ ] Verify it belongs to Demo Customer.
-* [ ] Display:
+* [x] Add `/projects/[id]`. (Added in Slice 5 as a minimal redirect target; this slice fleshes it out.)
+* [x] Load Project from Airtable.
+* [x] Verify it belongs to Demo Customer.
+* [x] Display:
 
   * Project title
   * instructions
@@ -256,10 +256,10 @@ Give the customer a useful project workspace.
   * status
   * tracking mode
   * source-file area
-* [ ] Display Dropbox upload action/status.
-* [ ] Add explicit Submit Project button.
-* [ ] Submit button must NOT yet submit until upload discovery is implemented.
-* [ ] Verify build.
+* [x] Display Dropbox upload action/status.
+* [x] Add explicit Submit Project button.
+* [x] Submit button must NOT yet submit until upload discovery is implemented. (Rendered disabled, not wired to any action.)
+* [x] Verify build.
 
 ---
 

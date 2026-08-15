@@ -35,6 +35,11 @@ export const STATUS_LABELS: Record<ProjectStatus, string> = {
   COMPLETED: "Completed",
 };
 
+export const TRACKING_MODE_LABELS: Record<TrackingMode, string> = {
+  PROJECT: "Project only",
+  MULTI_DELIVERABLE: "Multiple deliverables",
+};
+
 export type Project = {
   id: string;
   customerId: string;

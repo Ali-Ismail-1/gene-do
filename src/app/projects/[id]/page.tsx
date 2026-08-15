@@ -1,6 +1,22 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/current-user";
-import { getProjectById, STATUS_LABELS } from "@/lib/projects";
+import {
+  getProjectById,
+  STATUS_LABELS,
+  TRACKING_MODE_LABELS,
+} from "@/lib/projects";
+
+function formatDueDate(dueDate: string | null): string {
+  if (!dueDate) return "No due date set";
+  const date = new Date(dueDate);
+  if (Number.isNaN(date.getTime())) return "No due date set";
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 export default async function ProjectDetailPage({
   params,
@@ -30,29 +46,77 @@ export default async function ProjectDetailPage({
     : dropboxError;
 
   return (
-    <div>
+    <div className="project-detail">
+      <Link href="/projects" className="project-detail__back">
+        ← Back to Projects
+      </Link>
+
       <h1>{project.title}</h1>
       <p className="project-list__status">{STATUS_LABELS[project.status]}</p>
-      {project.description && <p>{project.description}</p>}
+
+      {project.description && (
+        <section>
+          <h2>Instructions</h2>
+          <p>{project.description}</p>
+        </section>
+      )}
 
       <section>
-        <h2>Dropbox</h2>
+        <h2>Details</h2>
+        <dl className="project-detail__meta">
+          <div>
+            <dt>Tracking Mode</dt>
+            <dd>{TRACKING_MODE_LABELS[project.trackingMode]}</dd>
+          </div>
+          <div>
+            <dt>Due Date</dt>
+            <dd>{formatDueDate(project.dueDate)}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Source Files</h2>
+        {project.sourceFiles.length > 0 ? (
+          <ul>
+            {project.sourceFiles.map((file) => (
+              <li key={file}>{file}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No files uploaded yet.</p>
+        )}
+      </section>
+
+      <section>
+        <h2>Upload Source Files</h2>
         {dropboxErrorMessage && (
           <p className="error-state">
             Folder setup failed: {dropboxErrorMessage}
           </p>
         )}
-        {project.dropboxSourceFolder &&
-        project.dropboxReviewFolder &&
-        project.dropboxFinalFolder ? (
-          <ul className="dropbox-folder-list">
-            <li>{project.dropboxSourceFolder}</li>
-            <li>{project.dropboxReviewFolder}</li>
-            <li>{project.dropboxFinalFolder}</li>
-          </ul>
+        {project.dropboxSourceFolder ? (
+          <>
+            <p>
+              Upload your files to this Dropbox folder. (Direct upload from
+              the portal is coming in a later step.)
+            </p>
+            <p className="dropbox-path">{project.dropboxSourceFolder}</p>
+          </>
         ) : (
-          !dropboxErrorMessage && <p>Dropbox folders not yet created.</p>
+          !dropboxErrorMessage && (
+            <p>Dropbox folders haven&apos;t been set up for this project yet.</p>
+          )
         )}
+      </section>
+
+      <section>
+        <button type="button" className="button" disabled>
+          Submit Project
+        </button>
+        <p className="project-detail__hint">
+          Submit becomes available once uploaded files can be detected.
+        </p>
       </section>
     </div>
   );
