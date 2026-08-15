@@ -19,6 +19,7 @@ async function airtableRequest(path: string, init?: RequestInit) {
   const { token, baseId } = getConfig();
   const response = await fetch(`${AIRTABLE_API_BASE}/${baseId}${path}`, {
     ...init,
+    cache: "no-store",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -26,6 +27,31 @@ async function airtableRequest(path: string, init?: RequestInit) {
     },
   });
   return response;
+}
+
+export type AirtableRecord = {
+  id: string;
+  createdTime?: string;
+  fields: Record<string, unknown>;
+};
+
+/**
+ * Fetches all records from the configured Projects table. The prototype's
+ * Projects table is small enough that a single unpaginated request is fine.
+ */
+export async function listProjectRecords(): Promise<AirtableRecord[]> {
+  const { projectsTable } = getConfig();
+  const response = await airtableRequest(
+    `/${encodeURIComponent(projectsTable)}`
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Airtable request failed (${response.status}): ${body}`);
+  }
+
+  const data = (await response.json()) as { records: AirtableRecord[] };
+  return data.records;
 }
 
 export type AirtableConnectionResult =

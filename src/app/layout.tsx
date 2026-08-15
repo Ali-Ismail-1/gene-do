@@ -27,6 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </Link>
           <nav className="site-header__nav">
             <Link href="/">Home</Link>
+            <Link href="/projects">Projects</Link>
           </nav>
           <div className="site-header__user">
             <span className="site-header__user-name">{currentUser.name}</span>

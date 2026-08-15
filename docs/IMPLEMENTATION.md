@@ -104,18 +104,18 @@ Goal:
 
 Use Airtable as the temporary prototype Project database.
 
-* [ ] Implement Project domain type.
-* [ ] Add `/projects`.
-* [ ] Query Airtable Projects server-side.
-* [ ] Filter/display Demo Customer projects.
-* [ ] Show:
+* [x] Implement Project domain type.
+* [x] Add `/projects`.
+* [x] Query Airtable Projects server-side.
+* [x] Filter/display Demo Customer projects.
+* [x] Show:
 
   * title
   * status
   * due date
-* [ ] Add empty state.
-* [ ] Add basic error state.
-* [ ] Verify build.
+* [x] Add empty state.
+* [x] Add basic error state.
+* [x] Verify build.
 
 Expected screen:
 

@@ -111,3 +111,36 @@ a {
   color: var(--muted);
   text-align: center;
 }
+
+.project-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.project-list__item {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.project-list__title {
+  font-weight: 600;
+}
+
+.project-list__status {
+  color: var(--muted);
+}
+
+.project-list__due {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.error-state {
+  color: #b00020;
+}
