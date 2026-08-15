@@ -325,6 +325,34 @@ Do not spend effort implementing or testing a 25 GB transfer.
 
 Large-file production behavior will be handled later with the appropriate Dropbox account and production upload mechanism.
 
+## Planned Production Upload Design (Not Implemented Yet)
+
+The prototype's upload mechanism proxies files through the Next.js server (browser → our server → Dropbox). That does not scale to real editing footage:
+
+* most Next.js hosting (Vercel in particular) hard-caps serverless request bodies well under what a 25 GB file needs, regardless of any Next.js config;
+* routing large files through the app server at all is the wrong architecture even where it's technically possible.
+
+The planned production approach avoids proxying the bytes through our server entirely:
+
+```text
+Browser
+  → uploads directly to Dropbox (chunked upload_session API)
+  → lands in a shared staging location
+  → browser notifies our server the upload finished
+  → our server moves the file (files/move_v2) from staging
+    into the correct Project's 01-Source folder
+```
+
+Key points:
+
+* The browser needs a Dropbox access token to upload directly, so a **second Dropbox app** is required, configured with **App Folder** access (not Full Dropbox, which is what the prototype's existing app uses — access type cannot be changed after an app is created). Our server mints short-lived tokens for that app on demand.
+* The browser's token is only ever able to write into the shared staging folder, not into arbitrary customer/project paths. This limits what a leaked short-lived token can do, and gives the server a checkpoint to validate the file (extension, size, whatever else) before promoting it into the customer-visible folder.
+* The actual move into `01-Source` happens server-side using the existing full-access `DROPBOX_ACCESS_TOKEN`, which can see both the staging app's storage and the `/Prototype Clients/...` tree.
+* Requires new credentials distinct from `DROPBOX_ACCESS_TOKEN`: an app key/secret for the new scoped app, and a refresh token obtained via a one-time OAuth consent flow.
+* Building a real chunked/resumable uploader (progress, retry on a failed chunk, recovering from a closed browser tab) is itself a non-trivial feature, separate from the staging/move design above.
+
+**Manual prerequisite before this can be implemented:** creating the new Dropbox app in the App Console and completing the OAuth consent flow both require a human in a browser — they can't be done by an agent working in this repo. This design is documented here for when that setup happens; it is intentionally not implemented in the prototype.
+
 ---
 
 # Project Creation Flow

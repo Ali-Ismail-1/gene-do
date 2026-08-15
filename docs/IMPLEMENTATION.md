@@ -538,5 +538,6 @@ Do not add these during prototype implementation unless the user explicitly chan
 * multiple video editors
 * billing
 * SaaS tenancy
+* direct browser-to-Dropbox large-file upload (chunked upload session + staging-folder move). Design documented in `docs/PROTOTYPE.md` under "Planned Production Upload Design" — needs a second Dropbox app (App Folder access) and a one-time OAuth setup step a human has to do, so it's blocked on that regardless of scope.
 
 The prototype should remain easy to understand and easy to discard/refactor.
