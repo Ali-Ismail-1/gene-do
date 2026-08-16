@@ -136,6 +136,39 @@ export async function listFolderFiles(
   }
 }
 
+export type TemporaryLinkResult =
+  | { ok: true; link: string }
+  | { ok: false; error: string };
+
+/**
+ * Mints a short-lived (~4hr) direct link for a single file so the
+ * customer can view/download it without the Dropbox token ever
+ * reaching the browser. Callers should fetch a fresh link per page
+ * load rather than caching it.
+ */
+export async function getTemporaryLink(
+  path: string
+): Promise<TemporaryLinkResult> {
+  try {
+    const response = await dropboxRequest("/files/get_temporary_link", {
+      path,
+    });
+
+    if (!response.ok) {
+      const body = await response.text();
+      return {
+        ok: false,
+        error: `Dropbox responded with ${response.status}: ${body}`,
+      };
+    }
+
+    const data = (await response.json()) as { link: string };
+    return { ok: true, link: data.link };
+  } catch (error) {
+    return { ok: false, error: (error as Error).message };
+  }
+}
+
 export type UploadFileResult =
   | { ok: true; name: string }
   | { ok: false; error: string };

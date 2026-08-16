@@ -495,16 +495,16 @@ Goal:
 
 Prove completed work can move back toward the customer.
 
-* [ ] Editor places small test output in `02-Review`.
-* [ ] Add editor workflow action/status `READY_FOR_REVIEW`.
-* [ ] When portal loads a READY_FOR_REVIEW Project:
+* [x] Editor places small test output in `02-Review`. (Manual editor step — verified by uploading a real test file directly to Dropbox.)
+* [x] Add editor workflow action/status `READY_FOR_REVIEW`. (Already existed in the ProjectStatus enum since Slice 4/11 — editor sets Portal Status directly in Airtable, same pattern as every other status transition. No "Requested Action" trigger-processing mechanism was built, matching the no-bidirectional-sync approach established in Slice 11.)
+* [x] When portal loads a READY_FOR_REVIEW Project:
 
   * query Review folder
   * list relevant review file(s)
-* [ ] Show review file to Demo Customer.
-* [ ] Notification may initially be simulated.
-* [ ] Do not build complete ReviewRound persistence.
-* [ ] Verify build.
+* [x] Show review file to Demo Customer. (Title + a "View / Download" link using a Dropbox temporary link, minted fresh per page load — see `getTemporaryLink` in `src/lib/dropbox.ts`.)
+* [x] Notification may initially be simulated. ("Review notification would be sent to {customer email}.")
+* [x] Do not build complete ReviewRound persistence. (No new table/history — live-queries Dropbox each render, same approach as Source Files.)
+* [x] Verify build.
 
 Expected result:
 

@@ -7,7 +7,7 @@ import {
   TRACKING_MODE_LABELS,
   TURNAROUND_LABELS,
 } from "@/lib/projects";
-import { listFolderFiles } from "@/lib/dropbox";
+import { listFolderFiles, getTemporaryLink } from "@/lib/dropbox";
 import { listDeliverablesForProject, DELIVERABLE_STATUS_LABELS } from "@/lib/deliverables";
 import { UploadSourceFileForm } from "./UploadSourceFileForm";
 import { SubmitProjectForm } from "./SubmitProjectForm";
@@ -53,6 +53,29 @@ export default async function ProjectDetailPage({
   const sourceFiles = project.dropboxSourceFolder
     ? await listFolderFiles(project.dropboxSourceFolder)
     : null;
+
+  let reviewFiles: { name: string; link: string | null }[] = [];
+  let reviewError: string | null = null;
+  if (project.status === "READY_FOR_REVIEW") {
+    if (!project.dropboxReviewFolder) {
+      reviewError = "Review folder hasn't been set up for this project.";
+    } else {
+      const listed = await listFolderFiles(project.dropboxReviewFolder);
+      if (!listed.ok) {
+        reviewError = listed.error;
+      } else {
+        const reviewFolder = project.dropboxReviewFolder;
+        reviewFiles = await Promise.all(
+          listed.files.map(async (name) => {
+            const linkResult = await getTemporaryLink(
+              `${reviewFolder}/${name}`
+            );
+            return { name, link: linkResult.ok ? linkResult.link : null };
+          })
+        );
+      }
+    }
+  }
 
   let deliverableSummary: Awaited<
     ReturnType<typeof listDeliverablesForProject>
@@ -151,6 +174,48 @@ export default async function ProjectDetailPage({
               </ul>
             </>
           )}
+        </section>
+      )}
+
+      {project.status === "READY_FOR_REVIEW" && (
+        <section>
+          <h2>Ready for Review</h2>
+          <p>Your edit is ready for review.</p>
+          {reviewError && (
+            <p className="error-state">
+              Couldn&apos;t load the review file: {reviewError}
+            </p>
+          )}
+          {!reviewError && reviewFiles.length === 0 && (
+            <p>
+              This project is marked ready for review, but no review file
+              was found yet — check with your editor.
+            </p>
+          )}
+          {!reviewError && reviewFiles.length > 0 && (
+            <ul>
+              {reviewFiles.map((file) => (
+                <li key={file.name}>
+                  {file.name}
+                  {file.link && (
+                    <>
+                      {" — "}
+                      <a
+                        href={file.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View / Download
+                      </a>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="project-detail__hint">
+            Review notification would be sent to {currentUser.email}.
+          </p>
         </section>
       )}
 

@@ -587,6 +587,17 @@ Review notification would be sent to client@example.com
 
 is acceptable until the workflow is proven.
 
+Implemented in Slice 14 with the simplification already established in
+Slice 11: the editor sets `Portal Status = READY_FOR_REVIEW` directly
+in Airtable (no `Requested Action`/`SEND_FOR_REVIEW` trigger-processing
+mechanism — that would mean the app watching for and reacting to
+Airtable changes, i.e. bidirectional sync, which Slice 11 deliberately
+avoided). "Verifies at least one file exists" happens on page render
+instead of at status-change time, since nothing intercepts the
+editor's Airtable edit: if the portal finds no file in `02-Review` for
+a `READY_FOR_REVIEW` project, it shows a message asking the customer
+to check with their editor, rather than blocking anything.
+
 ---
 
 # Changes Requested Prototype
