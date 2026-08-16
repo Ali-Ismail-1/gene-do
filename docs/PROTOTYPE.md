@@ -146,6 +146,7 @@ dropbox_source_folder
 dropbox_review_folder
 dropbox_final_folder
 source_files
+show_progress_to_customer
 created_at
 ```
 
@@ -281,6 +282,7 @@ Dropbox Source
 Dropbox Review
 Dropbox Final
 Command Result
+Show Progress To Customer
 Created At
 ```
 
@@ -637,6 +639,14 @@ rather than simply:
 Do not implement weighted progress.
 
 Project-only work should not show an invented numerical percentage.
+
+Implemented in Slice 13 as an editor-controlled, per-project Airtable
+checkbox: **Show Progress To Customer** (unchecked/absent by default —
+progress starts hidden). When unchecked, the Project detail page still
+lists each Deliverable's title and status, just without the aggregate
+count. When checked, it shows `X of Y complete` plus an optional
+computed percentage (e.g. `1 of 3 complete (33%)`) — the percentage is
+just count/total rounded, not a weighted or invented figure.
 
 ---
 

@@ -129,10 +129,18 @@ export default async function ProjectDetailPage({
           )}
           {deliverableSummary && deliverableSummary.totalCount > 0 && (
             <>
-              <p className="project-detail__hint">
-                {deliverableSummary.completeCount} of{" "}
-                {deliverableSummary.totalCount} complete
-              </p>
+              {project.showProgressToCustomer && (
+                <p className="project-detail__hint">
+                  {deliverableSummary.completeCount} of{" "}
+                  {deliverableSummary.totalCount} complete (
+                  {Math.round(
+                    (deliverableSummary.completeCount /
+                      deliverableSummary.totalCount) *
+                      100
+                  )}
+                  %)
+                </p>
+              )}
               <ul>
                 {deliverableSummary.deliverables.map((deliverable) => (
                   <li key={deliverable.id}>

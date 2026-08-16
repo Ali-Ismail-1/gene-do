@@ -80,6 +80,13 @@ Title (text), Status (text or single select — the app writes
 aren't created through the portal — the editor adds them directly in
 Airtable, linked to the relevant project.
 
+The Projects table also needs: **Turnaround** (single select —
+`Standard` / `Priority` / `Rush`, Title Case; customer-editable while
+a project is Draft) and **Show Progress To Customer** (checkbox —
+editor-only, per-project opt-in for showing the deliverable-completion
+count on a `MULTI_DELIVERABLE` project's detail page; unchecked/absent
+means hidden).
+
 ## Dropbox Setup
 
 Generate an access token for the development Dropbox account (a scoped

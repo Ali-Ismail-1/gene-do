@@ -477,15 +477,15 @@ Goal:
 
 Test whether aggregate progress is useful.
 
-* [ ] Add `show_progress_to_customer` prototype setting.
-* [ ] When false, hide counts.
-* [ ] When true and MULTI_DELIVERABLE:
+* [x] Add `show_progress_to_customer` prototype setting. (Airtable checkbox on Projects, "Show Progress To Customer" — editor-only, per-project, unchecked/absent by default.)
+* [x] When false, hide counts. (The per-deliverable title/status list still shows — only the aggregate count is gated.)
+* [x] When true and MULTI_DELIVERABLE:
 
   * display `X of Y deliverables complete`
-* [ ] Optional visual percentage may accompany the count.
-* [ ] Do not show numeric progress for PROJECT mode.
-* [ ] Do not implement weighted progress.
-* [ ] Verify build.
+* [x] Optional visual percentage may accompany the count. (`X of Y complete (Z%)` — plain count/total rounded, not weighted.)
+* [x] Do not show numeric progress for PROJECT mode. (Already true structurally — no Deliverables section renders for PROJECT mode at all, per Slice 12.)
+* [x] Do not implement weighted progress.
+* [x] Verify build.
 
 ---
 

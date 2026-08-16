@@ -61,6 +61,7 @@ export type Project = {
   dropboxReviewFolder: string | null;
   dropboxFinalFolder: string | null;
   sourceFiles: string[];
+  showProgressToCustomer: boolean;
   createdAt: string | null;
 };
 
@@ -136,6 +137,7 @@ function recordToProject(record: AirtableRecord): Project | null {
     dropboxReviewFolder: nullableStringField(record.fields, "Dropbox Review"),
     dropboxFinalFolder: nullableStringField(record.fields, "Dropbox Final"),
     sourceFiles,
+    showProgressToCustomer: record.fields["Show Progress To Customer"] === true,
     createdAt:
       nullableStringField(record.fields, "Created At") ??
       record.createdTime ??
