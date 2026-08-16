@@ -1,7 +1,11 @@
 "use server";
 
 import { getCurrentUser } from "@/lib/current-user";
-import { getProjectById, submitProject } from "@/lib/projects";
+import {
+  getProjectById,
+  submitProject,
+  requestChanges,
+} from "@/lib/projects";
 import {
   getProjectFolderPaths,
   listFolderFiles,
@@ -74,4 +78,29 @@ export async function submitProjectAction(
   }
 
   return { error: null, success: "Project submitted." };
+}
+
+export type RequestChangesState = {
+  error: string | null;
+  success: string | null;
+};
+
+export async function requestChangesAction(
+  _prevState: RequestChangesState,
+  formData: FormData
+): Promise<RequestChangesState> {
+  const projectId = String(formData.get("projectId") ?? "");
+  const feedback = String(formData.get("feedback") ?? "");
+  const currentUser = getCurrentUser();
+
+  const result = await requestChanges(
+    currentUser.customerId,
+    projectId,
+    feedback
+  );
+  if (!result.ok) {
+    return { error: result.error, success: null };
+  }
+
+  return { error: null, success: "Your feedback was submitted." };
 }

@@ -62,6 +62,7 @@ export type Project = {
   dropboxFinalFolder: string | null;
   sourceFiles: string[];
   showProgressToCustomer: boolean;
+  latestFeedback: string | null;
   createdAt: string | null;
 };
 
@@ -138,6 +139,7 @@ function recordToProject(record: AirtableRecord): Project | null {
     dropboxFinalFolder: nullableStringField(record.fields, "Dropbox Final"),
     sourceFiles,
     showProgressToCustomer: record.fields["Show Progress To Customer"] === true,
+    latestFeedback: nullableStringField(record.fields, "Latest Feedback"),
     createdAt:
       nullableStringField(record.fields, "Created At") ??
       record.createdTime ??
@@ -377,6 +379,58 @@ export async function updateProject(
   };
 
   const updatedRecord = await updateProjectRecord(record.id, fields);
+  const updatedProject = recordToProject(updatedRecord);
+  if (!updatedProject) {
+    return {
+      ok: false,
+      error: "Airtable did not return a valid project record after saving.",
+    };
+  }
+
+  return { ok: true, project: updatedProject };
+}
+
+export type RequestChangesResult =
+  | { ok: true; project: Project }
+  | { ok: false; error: string };
+
+/**
+ * Records customer feedback and moves the project to CHANGES_REQUESTED.
+ * Only allowed while a project is READY_FOR_REVIEW — that's the only
+ * state where there's something on offer to react to.
+ */
+export async function requestChanges(
+  customerId: string,
+  projectId: string,
+  feedback: string
+): Promise<RequestChangesResult> {
+  const trimmedFeedback = feedback.trim();
+  if (!trimmedFeedback) {
+    return { ok: false, error: "Enter your feedback before submitting." };
+  }
+
+  const record = await findProjectRecord(customerId, projectId);
+  if (!record) {
+    return { ok: false, error: "Project not found." };
+  }
+
+  const project = recordToProject(record);
+  if (!project) {
+    return { ok: false, error: "Airtable project record is invalid." };
+  }
+
+  if (project.status !== "READY_FOR_REVIEW") {
+    return {
+      ok: false,
+      error:
+        "Changes can only be requested while this project is ready for review.",
+    };
+  }
+
+  const updatedRecord = await updateProjectRecord(record.id, {
+    "Portal Status": "CHANGES_REQUESTED",
+    "Latest Feedback": trimmedFeedback,
+  });
   const updatedProject = recordToProject(updatedRecord);
   if (!updatedProject) {
     return {

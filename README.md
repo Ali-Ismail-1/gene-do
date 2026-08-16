@@ -82,10 +82,12 @@ Airtable, linked to the relevant project.
 
 The Projects table also needs: **Turnaround** (single select —
 `Standard` / `Priority` / `Rush`, Title Case; customer-editable while
-a project is Draft) and **Show Progress To Customer** (checkbox —
+a project is Draft), **Show Progress To Customer** (checkbox —
 editor-only, per-project opt-in for showing the deliverable-completion
 count on a `MULTI_DELIVERABLE` project's detail page; unchecked/absent
-means hidden).
+means hidden), and **Latest Feedback** (long text — set when the
+customer presses Request Changes on a `READY_FOR_REVIEW` project;
+holds only the latest feedback, not a history).
 
 ## Dropbox Setup
 

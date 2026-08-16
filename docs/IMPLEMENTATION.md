@@ -523,15 +523,15 @@ Goal:
 
 Prove feedback can flow from customer back to editor.
 
-* [ ] Add `Request Changes`.
-* [ ] Accept plain-text feedback.
-* [ ] Update Airtable:
+* [x] Add `Request Changes`. (Shown only while `READY_FOR_REVIEW` — the only state there's something to react to.)
+* [x] Accept plain-text feedback.
+* [x] Update Airtable:
 
   * Portal Status = CHANGES_REQUESTED
   * Latest Feedback
-* [ ] Display submitted feedback to customer.
-* [ ] Editor can see it in Airtable.
-* [ ] Verify build.
+* [x] Display submitted feedback to customer. (New "Changes Requested" section shown while status is CHANGES_REQUESTED.)
+* [x] Editor can see it in Airtable. (Trivially true — it's an Airtable field write.)
+* [x] Verify build.
 
 Do not create frame-accurate commenting.
 

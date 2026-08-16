@@ -147,6 +147,7 @@ dropbox_review_folder
 dropbox_final_folder
 source_files
 show_progress_to_customer
+latest_feedback
 created_at
 ```
 
@@ -283,6 +284,7 @@ Dropbox Review
 Dropbox Final
 Command Result
 Show Progress To Customer
+Latest Feedback
 Created At
 ```
 
@@ -618,6 +620,15 @@ Latest Feedback = "Please shorten the opening."
 ```
 
 Do not create complete ReviewRound history until the prototype proves the interaction.
+
+Implemented in Slice 15: **Request Changes** is shown to the customer
+only while a Project is `READY_FOR_REVIEW` — that's the only state
+there's a presented edit to react to. Submitting overwrites `Latest
+Feedback` (a single field, not a history) and sets
+`Portal Status = CHANGES_REQUESTED`, both guarded server-side (a
+project that isn't `READY_FOR_REVIEW` refuses the write, independent
+of whether the UI even shows the form). No ReviewRound table or
+feedback history exists — only the latest feedback is kept.
 
 ---
 

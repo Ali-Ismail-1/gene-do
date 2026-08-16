@@ -5,6 +5,22 @@ caveats and anything that isn't obvious from the code.
 
 ---
 
+## ⚠ Action needed: DROPBOX_ACCESS_TOKEN has expired (found 2026-08-16)
+
+Discovered while testing Slice 15: Dropbox started returning
+`expired_access_token` (401) on the live app. This is the short-lived
+token from the App Console the README already flags as fine "for the
+prototype" — it just needs periodic regeneration, it's not a code
+bug. **Generate a fresh token in the
+[App Console](https://www.dropbox.com/developers/apps) and update
+`DROPBOX_ACCESS_TOKEN` in `.env.local`** before the next demo or
+testing session. Until then, anything touching Dropbox (Source Files,
+Upload, Review) will show an error state on the portal — Airtable-only
+features (creating/editing/submitting a project, Request Changes) are
+unaffected.
+
+---
+
 ## Draft Project Editing + Friendlier Project Options (2026-08-16)
 
 A focused increment after Slice 12: customers can now edit a Project

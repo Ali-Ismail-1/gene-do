@@ -11,6 +11,7 @@ import { listFolderFiles, getTemporaryLink } from "@/lib/dropbox";
 import { listDeliverablesForProject, DELIVERABLE_STATUS_LABELS } from "@/lib/deliverables";
 import { UploadSourceFileForm } from "./UploadSourceFileForm";
 import { SubmitProjectForm } from "./SubmitProjectForm";
+import { RequestChangesForm } from "./RequestChangesForm";
 
 function formatDueDate(dueDate: string | null): string {
   if (!dueDate) return "No due date set";
@@ -216,6 +217,15 @@ export default async function ProjectDetailPage({
           <p className="project-detail__hint">
             Review notification would be sent to {currentUser.email}.
           </p>
+          <RequestChangesForm projectId={project.id} />
+        </section>
+      )}
+
+      {project.status === "CHANGES_REQUESTED" && (
+        <section>
+          <h2>Changes Requested</h2>
+          <p>You requested the following changes:</p>
+          <p>{project.latestFeedback}</p>
         </section>
       )}
 
