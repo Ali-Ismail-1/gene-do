@@ -7,7 +7,18 @@
       "Bash(git push origin main 2>&1)",
       "PowerShell(git status *)",
       "PowerShell(git diff *)",
-      "PowerShell(Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue)"
+      "PowerShell(Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue)",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(npm -v)",
+      "Bash(node *)",
+      "Bash(taskkill *)",
+      "Bash(curl -s http://localhost:3000/projects*)",
+      "Bash(curl -s -X POST http://localhost:3000/*)",
+      "Read(//tmp/**)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "WebSearch"
     ]
   }
 }
