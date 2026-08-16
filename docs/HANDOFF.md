@@ -5,6 +5,114 @@ caveats and anything that isn't obvious from the code.
 
 ---
 
+## Draft Project Editing + Friendlier Project Options (2026-08-16)
+
+A focused increment after Slice 12: customers can now edit a Project
+while it's `DRAFT`, tracking-mode labels are customer-facing instead
+of technical, and a new Turnaround field captures requested urgency.
+
+### What was implemented
+
+* **Edit Project** — `/projects/[id]/edit`, shown as a button on the
+  Project detail page only while `Portal Status = DRAFT`. Lets the
+  customer edit Project Name, Description, Due Date, Project Structure
+  (tracking mode), and Turnaround. Saving PATCHes the existing Airtable
+  row (`updateProject()` in `src/lib/projects.ts`) and redirects to
+  `/projects/[id]?updated=1`, which shows a "Project updated." message.
+  Guarded server-side, not just in the UI: `updateProject()` refuses to
+  write if the project's status isn't DRAFT, and the edit page itself
+  redirects a non-DRAFT project back to its detail page rather than
+  showing the form. So even a stale bookmark or replayed request can't
+  edit a submitted project.
+* **Customer-facing tracking-mode terminology** — the internal
+  `PROJECT`/`MULTI_DELIVERABLE` enum is unchanged (no data migration),
+  but every customer-facing surface (create form, edit form, Project
+  detail page) now shows "One video" / "Multiple videos" with short
+  descriptions instead of "Project only" / "Multiple deliverables."
+  The words `PROJECT`, `MULTI_DELIVERABLE`, and "Tracking Mode" never
+  reach customer-facing UI — the detail page's field is labeled "Type."
+* **Turnaround** — new field, separate from tracking mode (how the
+  work is organized) and due date (the requested deadline): `STANDARD`
+  / `PRIORITY` / `RUSH`, shown to customers as Standard / Priority /
+  Rush with the specified descriptions. Selectable on create and edit;
+  no pricing, invoicing, or editor-acceptance logic — it only captures
+  the customer's requested service level.
+* Extracted `src/lib/project-options.ts` — a plain (non-`server-only`)
+  module holding `TrackingMode`/`Turnaround` types and their
+  label/description option lists, since client form components can't
+  import from `server-only` `projects.ts`. `projects.ts` re-exports
+  from it so existing server-side imports didn't need to change.
+* New shared `src/components/RadioOptionGroup.tsx` (label +
+  description radio group), used by both the create and edit forms for
+  Project Structure and Turnaround — avoided duplicating that markup
+  twice per form, four times total.
+
+### Airtable schema change required
+
+Added a **Turnaround** field to the Projects table (single select:
+`Standard` / `Priority` / `Rush`) via the Metadata API — the token
+already had schema read/write access from Slice 12. Unlike Tracking
+Mode / Portal Status (which store the raw internal enum, e.g.
+`IN_PRODUCTION`), Turnaround stores the Title Case display value
+directly, so the app maps `STANDARD → "Standard"` etc. before writing
+(`TURNAROUND_AIRTABLE_VALUES` in `project-options.ts`). This was
+deliberate: Portal Status has accumulated both Title Case options (set
+up by hand originally) and SCREAMING_SNAKE_CASE options (auto-created
+by `typecast: true` when the app started writing raw enum values) —
+12 choices for 6 conceptual states. Turnaround avoids repeating that.
+
+No new env vars were needed — Turnaround lives on the existing
+Projects table, unlike Slice 12's Deliverables table which needed its
+own `AIRTABLE_DELIVERABLES_TABLE`.
+
+### Current customer-facing terminology
+
+```text
+Project type ("What do you need edited?")
+  One video       - One finished video or edit.
+  Multiple videos - Several videos, clips, episodes, or edits that
+                     should be tracked separately.
+
+Turnaround
+  Standard - Normal scheduling and turnaround.
+  Priority - Higher-priority scheduling. Additional cost may apply.
+  Rush     - Needed as soon as possible. Rush pricing and availability
+             must be confirmed by the editor.
+```
+
+### Implementation decisions
+
+* Project structure, turnaround, and due date are kept as three
+  separate fields/dimensions rather than merged — see
+  `docs/DECISIONS.md` if present, and `docs/PROTOTYPE.md`'s Project
+  section.
+* Editing is DRAFT-only by design; there is intentionally no
+  post-submission change-request system yet (see docs/PROTOTYPE.md).
+
+### Known issues
+
+* **Pre-existing due-date timezone bug, not introduced by this
+  increment.** `formatDueDate()` (used on both the detail page and
+  now surfaced again via the edit flow) does `new Date(dueDate)` then
+  `toLocaleDateString` in the server's local timezone. A date string
+  like `"2026-09-15"` parses as UTC midnight, so on a server whose
+  local timezone is behind UTC it displays as September 14. Found
+  while testing this increment (editing a project and checking the
+  saved due date rendered one day earlier than submitted); left
+  unfixed since it's unrelated to this increment's scope. Fix: parse
+  the date components directly instead of relying on `Date` + implicit
+  timezone conversion, or force UTC in the formatter.
+* No automated test suite exists in this project — nothing to run for
+  "tests pass if relevant tests exist."
+
+### Next remaining slice
+
+Slice 13 — Optional Customer Progress (`X of Y deliverables complete`
+shown to the customer, gated by a `show_progress_to_customer` setting).
+See `docs/IMPLEMENTATION.md`.
+
+---
+
 ## Pre-Demo Usability Pass (2026-08-15)
 
 A UX cleanup pass only, done ahead of a demo to a prospective client.

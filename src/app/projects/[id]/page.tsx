@@ -5,6 +5,7 @@ import {
   getProjectById,
   STATUS_LABELS,
   TRACKING_MODE_LABELS,
+  TURNAROUND_LABELS,
 } from "@/lib/projects";
 import { listFolderFiles } from "@/lib/dropbox";
 import { listDeliverablesForProject, DELIVERABLE_STATUS_LABELS } from "@/lib/deliverables";
@@ -27,7 +28,7 @@ export default async function ProjectDetailPage({
   searchParams,
 }: PageProps<"/projects/[id]">) {
   const { id } = await params;
-  const { dropboxError } = await searchParams;
+  const { dropboxError, updated } = await searchParams;
   const currentUser = getCurrentUser();
 
   let project;
@@ -74,8 +75,21 @@ export default async function ProjectDetailPage({
         ← Back to Projects
       </Link>
 
-      <h1>{project.title}</h1>
-      <p className="project-list__status">{STATUS_LABELS[project.status]}</p>
+      <div className="page-header">
+        <div>
+          <h1>{project.title}</h1>
+          <p className="project-list__status">
+            {STATUS_LABELS[project.status]}
+          </p>
+        </div>
+        {project.status === "DRAFT" && (
+          <Link href={`/projects/${project.id}/edit`} className="button">
+            Edit Project
+          </Link>
+        )}
+      </div>
+
+      {updated && <p className="success-state">Project updated.</p>}
 
       {project.description && (
         <section>
@@ -85,15 +99,19 @@ export default async function ProjectDetailPage({
       )}
 
       <section>
-        <h2>Details</h2>
+        <h2>Project Details</h2>
         <dl className="project-detail__meta">
           <div>
-            <dt>Tracking Mode</dt>
+            <dt>Type</dt>
             <dd>{TRACKING_MODE_LABELS[project.trackingMode]}</dd>
           </div>
           <div>
-            <dt>Due Date</dt>
+            <dt>Due date</dt>
             <dd>{formatDueDate(project.dueDate)}</dd>
+          </div>
+          <div>
+            <dt>Turnaround</dt>
+            <dd>{TURNAROUND_LABELS[project.turnaround]}</dd>
           </div>
         </dl>
       </section>

@@ -420,6 +420,57 @@ Support Projects containing many separately tracked outputs.
 
 ---
 
+# Increment — Draft Project Editing + Friendlier Project Options
+
+Not a numbered slice — a focused increment requested after Slice 12,
+improving the customer-facing Project experience before continuing
+further down the slice list.
+
+Goal:
+
+Let customers edit a Project while it's still `DRAFT`, replace
+developer-oriented tracking-mode labels with customer language, and
+add a separate turnaround/urgency field.
+
+* [x] Add an **Edit Project** action on the Project detail page,
+      shown only while `Portal Status = DRAFT`.
+* [x] Customer can edit: Project Name, Description/Instructions, Due
+      Date, Project Structure (tracking mode), Turnaround.
+* [x] Edits persist to the existing Airtable Project record; after
+      saving, redirect to the Project detail page showing the updated
+      values and a "Project updated." success message.
+* [x] Non-`DRAFT` Projects do not show the Edit action. Guarded both
+      in the UI (link only renders for DRAFT) and server-side
+      (`updateProject()` refuses to write if status isn't DRAFT;
+      navigating directly to `/projects/[id]/edit` for a non-DRAFT
+      project redirects back to the detail page).
+* [x] Replace customer-facing tracking-mode labels: "One video" /
+      "Multiple videos" (internal `PROJECT`/`MULTI_DELIVERABLE` values
+      unchanged — no data migration). Used consistently on the create
+      form, edit form, and Project detail page.
+* [x] Add `turnaround` field: `STANDARD` / `PRIORITY` / `RUSH`,
+      customer-facing as Standard / Priority / Rush, each with the
+      exact descriptions specified for this increment. Separate
+      dimension from tracking mode and due date — not combined into
+      one field.
+* [x] Add Airtable `Turnaround` field (Projects table) storing Title
+      Case values (`Standard`/`Priority`/`Rush`), created via the
+      Metadata API since the token already had schema write access
+      from Slice 12.
+* [x] Verify lint/build.
+
+Explicitly not built (per this increment's scope): pricing
+calculations, payment collection, rush-fee invoicing, editor
+acceptance of Rush, availability calendars, automatic next-day
+promises, post-submission Project editing, scope-change approvals,
+notification workflows.
+
+See `docs/HANDOFF.md` for what was tested and known issues (a
+pre-existing due-date timezone display bug was found during testing,
+not introduced by this increment, and intentionally left unfixed here).
+
+---
+
 # Slice 13 — Optional Customer Progress
 
 Goal:

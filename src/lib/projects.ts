@@ -6,8 +6,20 @@ import {
   type AirtableRecord,
 } from "./airtable";
 import { provisionProjectFolders, listFolderFiles } from "./dropbox";
+import {
+  type TrackingMode,
+  type Turnaround,
+  TURNAROUND_VALUES,
+  TURNAROUND_AIRTABLE_VALUES,
+} from "./project-options";
 
-export type TrackingMode = "PROJECT" | "MULTI_DELIVERABLE";
+export type { TrackingMode, Turnaround };
+export {
+  TRACKING_MODE_LABELS,
+  TRACKING_MODE_OPTIONS,
+  TURNAROUND_LABELS,
+  TURNAROUND_OPTIONS,
+} from "./project-options";
 
 export type ProjectStatus =
   | "DRAFT"
@@ -35,11 +47,6 @@ export const STATUS_LABELS: Record<ProjectStatus, string> = {
   COMPLETED: "Complete",
 };
 
-export const TRACKING_MODE_LABELS: Record<TrackingMode, string> = {
-  PROJECT: "Project only",
-  MULTI_DELIVERABLE: "Multiple deliverables",
-};
-
 export type Project = {
   id: string;
   customerId: string;
@@ -48,6 +55,7 @@ export type Project = {
   description: string;
   dueDate: string | null;
   trackingMode: TrackingMode;
+  turnaround: Turnaround;
   status: ProjectStatus;
   dropboxSourceFolder: string | null;
   dropboxReviewFolder: string | null;
@@ -74,6 +82,13 @@ function normalizeTrackingMode(raw: unknown): TrackingMode {
   return screamingSnakeCase(raw) === "MULTI_DELIVERABLE"
     ? "MULTI_DELIVERABLE"
     : "PROJECT";
+}
+
+function normalizeTurnaround(raw: unknown): Turnaround {
+  const normalized = screamingSnakeCase(raw);
+  return TURNAROUND_VALUES.includes(normalized as Turnaround)
+    ? (normalized as Turnaround)
+    : "STANDARD";
 }
 
 function stringField(fields: Record<string, unknown>, name: string): string {
@@ -115,6 +130,7 @@ function recordToProject(record: AirtableRecord): Project | null {
     description: stringField(record.fields, "Description"),
     dueDate: nullableStringField(record.fields, "Due Date"),
     trackingMode: normalizeTrackingMode(record.fields["Tracking Mode"]),
+    turnaround: normalizeTurnaround(record.fields["Turnaround"]),
     status: normalizeStatus(record.fields["Portal Status"]),
     dropboxSourceFolder: nullableStringField(record.fields, "Dropbox Source"),
     dropboxReviewFolder: nullableStringField(record.fields, "Dropbox Review"),
@@ -186,6 +202,7 @@ export type NewProjectInput = {
   description: string;
   dueDate: string | null;
   trackingMode: TrackingMode;
+  turnaround: Turnaround;
 };
 
 export type CreateProjectResult = {
@@ -209,6 +226,7 @@ export async function createProject(
     "Project Name": input.title,
     Description: input.description,
     "Tracking Mode": input.trackingMode,
+    Turnaround: TURNAROUND_AIRTABLE_VALUES[input.turnaround],
     "Portal Status": "DRAFT",
     "Created At": new Date().toISOString(),
   };
@@ -301,6 +319,67 @@ export async function submitProject(
     return {
       ok: false,
       error: "Airtable did not return a valid project record after submitting.",
+    };
+  }
+
+  return { ok: true, project: updatedProject };
+}
+
+export type UpdateProjectInput = {
+  title: string;
+  description: string;
+  dueDate: string | null;
+  trackingMode: TrackingMode;
+  turnaround: Turnaround;
+};
+
+export type UpdateProjectResult =
+  | { ok: true; project: Project }
+  | { ok: false; error: string };
+
+/**
+ * Edits a project's customer-editable fields. Only allowed while the
+ * project is still DRAFT — this is a prototype, not a post-submission
+ * change-request system, so once the editor has the project there's
+ * nothing here to edit against.
+ */
+export async function updateProject(
+  customerId: string,
+  projectId: string,
+  input: UpdateProjectInput
+): Promise<UpdateProjectResult> {
+  const record = await findProjectRecord(customerId, projectId);
+  if (!record) {
+    return { ok: false, error: "Project not found." };
+  }
+
+  const project = recordToProject(record);
+  if (!project) {
+    return { ok: false, error: "Airtable project record is invalid." };
+  }
+
+  if (project.status !== "DRAFT") {
+    return {
+      ok: false,
+      error:
+        "This project can no longer be edited — it has already been submitted.",
+    };
+  }
+
+  const fields: Record<string, unknown> = {
+    "Project Name": input.title,
+    Description: input.description,
+    "Tracking Mode": input.trackingMode,
+    Turnaround: TURNAROUND_AIRTABLE_VALUES[input.turnaround],
+    "Due Date": input.dueDate,
+  };
+
+  const updatedRecord = await updateProjectRecord(record.id, fields);
+  const updatedProject = recordToProject(updatedRecord);
+  if (!updatedProject) {
+    return {
+      ok: false,
+      error: "Airtable did not return a valid project record after saving.",
     };
   }
 

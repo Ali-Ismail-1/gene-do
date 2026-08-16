@@ -140,6 +140,7 @@ title
 description
 due_date
 tracking_mode
+turnaround
 status
 dropbox_source_folder
 dropbox_review_folder
@@ -155,6 +156,49 @@ PROJECT
 MULTI_DELIVERABLE
 ```
 
+These are internal/technical values only. Customer-facing UI must never
+show the words `PROJECT`, `MULTI_DELIVERABLE`, or "Tracking Mode" —
+present this dimension as **Project type** (or a question like "What
+do you need edited?") using these labels:
+
+```text
+PROJECT           -> "One video"
+                      One finished video or edit.
+
+MULTI_DELIVERABLE -> "Multiple videos"
+                      Several videos, clips, episodes, or edits that
+                      should be tracked separately.
+```
+
+### Turnaround
+
+A separate dimension from tracking mode (how the work is organized)
+and due date (the requested calendar deadline) — do not combine
+these. Turnaround is how urgently the customer wants the work
+handled:
+
+```text
+STANDARD -> "Standard"
+             Normal scheduling and turnaround.
+
+PRIORITY -> "Priority"
+             Higher-priority scheduling. Additional cost may apply.
+
+RUSH     -> "Rush"
+             Needed as soon as possible. Rush pricing and availability
+             must be confirmed by the editor.
+```
+
+Rush is a request for expedited treatment, not a guaranteed deadline —
+do not promise a specific turnaround time (e.g. next-day) automatically.
+No pricing, invoicing, or editor-acceptance workflow exists yet for
+Priority/Rush; the prototype only captures the customer's requested
+service level.
+
+A valid Project combination is therefore e.g. "Multiple videos /
+Rush / due tomorrow" or "One video / Standard / due in two weeks" —
+tracking mode, turnaround, and due date vary independently.
+
 Prototype statuses:
 
 ```text
@@ -165,6 +209,20 @@ READY_FOR_REVIEW
 CHANGES_REQUESTED
 COMPLETED
 ```
+
+### Draft Editing
+
+While a Project is `DRAFT`, the customer can edit its title,
+description, due date, tracking mode, and turnaround from the portal
+(an explicit **Edit Project** action on the Project detail page).
+Edits persist directly to the existing Airtable row — no revision
+history is kept.
+
+Once a Project leaves `DRAFT` (i.e. it has been submitted), it is no
+longer editable from the portal. Post-submission change requests
+(scope changes after the editor has started work) are an intentionally
+deferred production concern — the prototype does not build a
+change-request/approval system.
 
 ---
 
@@ -215,6 +273,7 @@ Project Name
 Description
 Due Date
 Tracking Mode
+Turnaround
 Portal Status
 Requested Action
 Source Files
@@ -236,6 +295,18 @@ Do not rely on the Airtable record ID as the domain identity.
 ### Portal Status
 
 Represents the status the portal shows.
+
+### Turnaround
+
+Stores the customer's requested service level as Title Case values —
+`Standard` / `Priority` / `Rush` — unlike Tracking Mode and Portal
+Status, which store the raw internal enum. This was a deliberate
+choice: earlier internal-enum writes (with `typecast: true` letting
+Airtable auto-create new select options) left Portal Status with both
+Title Case options (from when the field was set up by hand) and
+SCREAMING_SNAKE_CASE options (auto-created by the app) — see
+docs/HANDOFF.md. Turnaround avoids that duplication by having the app
+map to the display value before writing.
 
 ### Requested Action
 

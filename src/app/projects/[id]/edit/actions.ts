@@ -2,17 +2,18 @@
 
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/current-user";
-import { createProject } from "@/lib/projects";
+import { updateProject } from "@/lib/projects";
 import { TURNAROUND_VALUES, type Turnaround } from "@/lib/project-options";
 
-export type CreateProjectState = {
+export type EditProjectState = {
   error: string | null;
 };
 
-export async function createProjectAction(
-  _prevState: CreateProjectState,
+export async function updateProjectAction(
+  _prevState: EditProjectState,
   formData: FormData
-): Promise<CreateProjectState> {
+): Promise<EditProjectState> {
+  const projectId = String(formData.get("projectId") ?? "");
   const title = String(formData.get("title") ?? "").trim();
   if (!title) {
     return { error: "Project name is required." };
@@ -33,23 +34,17 @@ export async function createProjectAction(
 
   const currentUser = getCurrentUser();
 
-  let result;
-  try {
-    result = await createProject({
-      customerId: currentUser.customerId,
-      customerName: currentUser.name,
-      title,
-      description,
-      dueDate,
-      trackingMode,
-      turnaround,
-    });
-  } catch (error) {
-    return { error: (error as Error).message };
+  const result = await updateProject(currentUser.customerId, projectId, {
+    title,
+    description,
+    dueDate,
+    trackingMode,
+    turnaround,
+  });
+
+  if (!result.ok) {
+    return { error: result.error };
   }
 
-  const query = result.dropboxError
-    ? `?dropboxError=${encodeURIComponent(result.dropboxError)}`
-    : "";
-  redirect(`/projects/${result.project.id}${query}`);
+  redirect(`/projects/${projectId}?updated=1`);
 }

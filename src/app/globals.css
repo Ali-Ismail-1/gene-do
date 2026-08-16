@@ -253,12 +253,29 @@ a {
   color: var(--foreground);
 }
 
-.project-form__radio {
+.project-form__radio-option {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  align-items: flex-start;
+  gap: 0.5rem;
   font-weight: 400;
-  margin-top: 0.4rem;
+  margin-top: 0.6rem;
+  cursor: pointer;
+}
+
+.project-form__radio-option input {
+  margin-top: 0.3rem;
+}
+
+.project-form__radio-label {
+  display: block;
+  font-weight: 600;
+}
+
+.project-form__radio-description {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 400;
 }
 
 .button {
