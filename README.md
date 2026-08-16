@@ -71,6 +71,15 @@ With `AIRTABLE_TOKEN`/`AIRTABLE_BASE_ID`/`AIRTABLE_PROJECTS_TABLE` set in
 in development to verify connectivity. This route 404s outside
 development.
 
+Also create a **Deliverables** table (name it to match
+`AIRTABLE_DELIVERABLES_TABLE`) for `MULTI_DELIVERABLE` projects, with
+fields: Deliverable ID (text), Project (link to the Projects table),
+Title (text), Status (text or single select — the app writes
+`NOT_STARTED` / `IN_PRODUCTION` / `READY_FOR_REVIEW` /
+`CHANGES_REQUESTED` / `COMPLETED`), Sort Order (number). Deliverables
+aren't created through the portal — the editor adds them directly in
+Airtable, linked to the relevant project.
+
 ## Dropbox Setup
 
 Generate an access token for the development Dropbox account (a scoped

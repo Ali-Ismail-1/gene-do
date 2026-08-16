@@ -285,6 +285,26 @@ Project should be an Airtable linked record.
 
 Do not create fake Deliverables for `PROJECT` tracking mode.
 
+Deliverable `Status` values (chosen in Slice 12, since this section
+didn't specify them):
+
+```text
+NOT_STARTED
+IN_PRODUCTION
+READY_FOR_REVIEW
+CHANGES_REQUESTED
+COMPLETED
+```
+
+`DRAFT`/`SUBMITTED` are Project-level concepts (they describe the
+customer's submission action) and don't apply per-Deliverable, so
+`NOT_STARTED` stands in as the starting state. "Complete count" is
+simply the number of Deliverables with `Status = COMPLETED`.
+
+Deliverables are not created through the portal in the prototype —
+the editor adds them directly in Airtable, linked to the relevant
+Project.
+
 ---
 
 # Dropbox Prototype Structure

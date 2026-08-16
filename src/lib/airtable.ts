@@ -104,6 +104,27 @@ export async function updateProjectRecord(
   return (await response.json()) as AirtableRecord;
 }
 
+/**
+ * Fetches all records from the configured Deliverables table. Kept
+ * separate from getConfig()'s Projects-table wiring so listing
+ * deliverables doesn't start requiring an unrelated Projects env var,
+ * and vice versa.
+ */
+export async function listDeliverableRecords(): Promise<AirtableRecord[]> {
+  const deliverablesTable = requireEnv("AIRTABLE_DELIVERABLES_TABLE");
+  const response = await airtableRequest(
+    `/${encodeURIComponent(deliverablesTable)}`
+  );
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Airtable request failed (${response.status}): ${body}`);
+  }
+
+  const data = (await response.json()) as { records: AirtableRecord[] };
+  return data.records;
+}
+
 export type AirtableConnectionResult =
   | { ok: true; recordCount: number }
   | { ok: false; error: string };

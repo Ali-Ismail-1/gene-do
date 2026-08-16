@@ -7,6 +7,7 @@ import {
   TRACKING_MODE_LABELS,
 } from "@/lib/projects";
 import { listFolderFiles } from "@/lib/dropbox";
+import { listDeliverablesForProject, DELIVERABLE_STATUS_LABELS } from "@/lib/deliverables";
 import { UploadSourceFileForm } from "./UploadSourceFileForm";
 import { SubmitProjectForm } from "./SubmitProjectForm";
 
@@ -52,6 +53,21 @@ export default async function ProjectDetailPage({
     ? await listFolderFiles(project.dropboxSourceFolder)
     : null;
 
+  let deliverableSummary: Awaited<
+    ReturnType<typeof listDeliverablesForProject>
+  > | null = null;
+  let deliverablesError: string | null = null;
+  if (project.trackingMode === "MULTI_DELIVERABLE") {
+    try {
+      deliverableSummary = await listDeliverablesForProject(
+        currentUser.customerId,
+        id
+      );
+    } catch (error) {
+      deliverablesError = (error as Error).message;
+    }
+  }
+
   return (
     <div className="project-detail">
       <Link href="/projects" className="project-detail__back">
@@ -81,6 +97,36 @@ export default async function ProjectDetailPage({
           </div>
         </dl>
       </section>
+
+      {project.trackingMode === "MULTI_DELIVERABLE" && (
+        <section>
+          <h2>Deliverables</h2>
+          {deliverablesError && (
+            <p className="error-state">
+              Couldn&apos;t load deliverables: {deliverablesError}
+            </p>
+          )}
+          {deliverableSummary && deliverableSummary.totalCount === 0 && (
+            <p>No deliverables yet.</p>
+          )}
+          {deliverableSummary && deliverableSummary.totalCount > 0 && (
+            <>
+              <p className="project-detail__hint">
+                {deliverableSummary.completeCount} of{" "}
+                {deliverableSummary.totalCount} complete
+              </p>
+              <ul>
+                {deliverableSummary.deliverables.map((deliverable) => (
+                  <li key={deliverable.id}>
+                    {deliverable.title} —{" "}
+                    {DELIVERABLE_STATUS_LABELS[deliverable.status]}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      )}
 
       <section>
         <h2>Source Files</h2>

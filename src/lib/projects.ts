@@ -166,6 +166,19 @@ export async function getProjectById(
   return record ? recordToProject(record) : null;
 }
 
+/**
+ * Resolves a project's Airtable record id (not our own Project ID UUID)
+ * for callers that need to match against an Airtable linked-record field,
+ * e.g. filtering Deliverables by their Project link.
+ */
+export async function getProjectRecordId(
+  customerId: string,
+  projectId: string
+): Promise<string | null> {
+  const record = await findProjectRecord(customerId, projectId);
+  return record?.id ?? null;
+}
+
 export type NewProjectInput = {
   customerId: string;
   customerName: string;

@@ -400,23 +400,23 @@ Goal:
 
 Support Projects containing many separately tracked outputs.
 
-* [ ] Configure Airtable Deliverables table.
-* [ ] Implement Deliverable domain type.
-* [ ] For MULTI_DELIVERABLE Project, allow Deliverables.
-* [ ] Fields:
+* [x] Configure Airtable Deliverables table. (Created via the Airtable Metadata API after the token was granted schema read/write.)
+* [x] Implement Deliverable domain type.
+* [x] For MULTI_DELIVERABLE Project, allow Deliverables.
+* [x] Fields:
 
   * Deliverable ID
   * Project
   * Title
   * Status
   * Sort Order
-* [ ] Show Deliverables on Project page.
-* [ ] Do not create Deliverables for PROJECT mode.
-* [ ] Calculate:
+* [x] Show Deliverables on Project page.
+* [x] Do not create Deliverables for PROJECT mode. (No creation UI exists at all — Deliverables are added directly in Airtable by the editor. Section only renders for MULTI_DELIVERABLE.)
+* [x] Calculate:
 
   * complete count
   * total count
-* [ ] Verify build.
+* [x] Verify build.
 
 ---
 
